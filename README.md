@@ -1,5 +1,6 @@
 # AI Assistant Chat
 
+This app is for educational purpuse. Learn e2e playwright testing!
 React + Vite + TypeScript chat UI for manual use and Playwright E2E tests.
 
 ## Setup
@@ -7,14 +8,6 @@ React + Vite + TypeScript chat UI for manual use and Playwright E2E tests.
 ```bash
 npm install
 ```
-
-Copy the API base URL (optional if you use the default `http://localhost:3001` baked into the client):
-
-```bash
-cp .env.example .env
-```
-
-Set `VITE_API_URL` in `.env` to your backend origin (no trailing slash required).
 
 ## Run
 
