@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 // Screen under test: Playground ("/playground") — hand-built widgets that
 // don't behave like plain text inputs: drag-and-drop, a range slider,
-// and toggle buttons.
+// toggle buttons, a video player, and a modal.
 
 test.describe('Lesson 5: Custom widgets & complex interactions', () => {
   test.beforeEach(async ({ page }) => {
@@ -61,5 +61,43 @@ test.describe('Lesson 5: Custom widgets & complex interactions', () => {
     await expect(heroThumb).toHaveAttribute('aria-pressed', 'false')
     await expect(mainImage).toHaveAttribute('alt', 'React logo')
     await expect(page.getByTestId('gallery-caption')).toHaveText('React logo')
+  })
+
+  test('video play/mute buttons toggle their own label and aria-pressed state', async ({ page }) => {
+    const playButton = page.getByTestId('video-play-button')
+    const muteButton = page.getByTestId('video-mute-button')
+
+    // Muted by default (autoplay policies generally require it); not playing yet.
+    await expect(playButton).toHaveText('Play')
+    await expect(playButton).toHaveAttribute('aria-pressed', 'false')
+    await expect(muteButton).toHaveText('Unmute')
+    await expect(muteButton).toHaveAttribute('aria-pressed', 'true')
+
+    await playButton.click()
+    await expect(playButton).toHaveText('Pause')
+    await expect(playButton).toHaveAttribute('aria-pressed', 'true')
+
+    await muteButton.click()
+    await expect(muteButton).toHaveText('Mute')
+    await expect(muteButton).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  test('the modal can be dismissed the same way via Cancel or a backdrop click', async ({ page }) => {
+    const dialog = page.getByTestId('modal-dialog')
+
+    await page.getByTestId('modal-open-button').click()
+    await expect(dialog).toBeVisible()
+    await page.getByTestId('modal-cancel-button').click()
+    await expect(dialog).not.toBeVisible()
+    await expect(page.getByTestId('modal-result')).toHaveText('Last action: cancelled')
+
+    // A click that lands on the backdrop itself — not on the dialog it wraps
+    // — closes the modal too, because the dialog stops the click from
+    // bubbling up. Targeting a corner keeps the click off the centered dialog.
+    await page.getByTestId('modal-open-button').click()
+    await expect(dialog).toBeVisible()
+    await page.getByTestId('modal-backdrop').click({ position: { x: 5, y: 5 } })
+    await expect(dialog).not.toBeVisible()
+    await expect(page.getByTestId('modal-result')).toHaveText('Last action: cancelled')
   })
 })
