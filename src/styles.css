@@ -520,51 +520,6 @@ body {
   color: #111827;
 }
 
-/* Slider */
-
-.widget-slider {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.widget-slider__label {
-  font-size: 0.9rem;
-  color: #374151;
-}
-
-.widget-slider input[type='range'] {
-  flex: 1;
-  accent-color: #2563eb;
-}
-
-.widget-slider__value {
-  font-size: 0.9rem;
-  font-variant-numeric: tabular-nums;
-  color: #111827;
-  min-width: 3ch;
-  text-align: right;
-}
-
-.widget-slider__reset {
-  font: inherit;
-  font-size: 0.85rem;
-  padding: 0.35rem 0.65rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: #fff;
-  cursor: pointer;
-}
-
-.widget-slider__reset:hover:not(:disabled) {
-  background: #f9fafb;
-}
-
-.widget-slider__reset:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 /* Drag and drop */
 
 .widget-dnd {
