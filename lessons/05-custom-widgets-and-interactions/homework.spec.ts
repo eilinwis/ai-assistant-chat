@@ -3,12 +3,13 @@ import { test } from '@playwright/test'
 /**
  * Homework 5 — Custom widgets & complex interactions
  *
- * Screen under test: Playground ("/playground") — the Calendar, Modal, and
- * Filter widgets (demo.spec.ts covered drag-and-drop, the slider, the
- * gallery, the video player, and the modal's two "cancel" paths).
+ * Screen under test: Playground ("/playground") — the Calendar, Modal,
+ * Filter, and Gallery widgets (demo.spec.ts covered drag-and-drop, the
+ * slider, the gallery's basic toggle, the video player, and the modal's
+ * three ways of closing).
  *
- * Complete the exercise below. It's split into two tests — write each one,
- * deleting its `test.fixme()` line once it passes.
+ * Complete the exercise below. It's split into three tests — write each
+ * one, deleting its `test.fixme()` line once it passes.
  */
 test.describe('Homework 5: Custom widgets & complex interactions', () => {
   /**
@@ -61,6 +62,33 @@ test.describe('Homework 5: Custom widgets & complex interactions', () => {
    *      results count is 5 (all seeded items, no filters active).
    */
   test('combining a category toggle with a search query narrows and resets the results', async () => {
+    test.fixme()
+
+    // Write your code here
+  })
+
+  /**
+   * Test 3 — Calendar navigation & Gallery cycling
+   *   1. Go to "/playground". Save the calendar heading's text
+   *      (data-testid="calendar-heading").
+   *   2. Click data-testid="calendar-next", then data-testid="calendar-prev"
+   *      — assert the heading is back to the exact text you saved in step 1
+   *      (prev/next should be exact inverses of each other).
+   *   3. Compute today's ISO date yourself (`YYYY-MM-DD`, zero-padded) from
+   *      `new Date()`, and locate that day's cell:
+   *      `page.getByTestId(`calendar-day-${iso}`)`. Assert it has the class
+   *      `widget-calendar__day--today` (`toHaveClass` accepts a substring
+   *      via a regex, e.g. `/widget-calendar__day--today/`, so you don't
+   *      need to match the whole class list).
+   *   4. In the gallery, click through all four thumbnails in order — hero,
+   *      logo, react, vite (data-testid="gallery-thumb-<id>") — and after
+   *      each click assert that specific thumbnail's `aria-pressed` is
+   *      "true".
+   *   5. Click the vite thumbnail a second time (it's already active) and
+   *      assert nothing changes: `aria-pressed` is still "true" and
+   *      data-testid="gallery-main-image" still has `alt="Vite logo"`.
+   */
+  test('prev/next cancel out, today is marked in the grid, and clicking the active thumbnail again is a no-op', async () => {
     test.fixme()
 
     // Write your code here

@@ -100,4 +100,39 @@ test.describe('Lesson 5: Custom widgets & complex interactions', () => {
     await expect(dialog).not.toBeVisible()
     await expect(page.getByTestId('modal-result')).toHaveText('Last action: cancelled')
   })
+
+  test('Escape closes the modal too, but — unlike Cancel — it never records a result', async ({ page }) => {
+    // Don't assume Escape is "just another way to cancel" — check the app.
+    // Its keydown handler only closes the dialog; it never calls the same
+    // close() function Cancel/Confirm/backdrop-click do, so no outcome is
+    // ever recorded for it.
+    const dialog = page.getByTestId('modal-dialog')
+
+    await page.getByTestId('modal-open-button').click()
+    await expect(dialog).toBeVisible()
+
+    await page.keyboard.press('Escape')
+
+    await expect(dialog).not.toBeVisible()
+    await expect(page.getByTestId('modal-result')).toHaveCount(0) // no "Last action" line at all
+  })
+
+  test('dragging every item out empties the source list, and reset restores all of them', async ({ page }) => {
+    const dropzone = page.getByTestId('dnd-dropzone')
+
+    await page.getByTestId('dnd-item-apple').dragTo(dropzone)
+    await page.getByTestId('dnd-item-banana').dragTo(dropzone)
+    await page.getByTestId('dnd-item-cherry').dragTo(dropzone)
+
+    // With nothing left to drag, the source list swaps to its empty-state text.
+    await expect(page.getByTestId('dnd-source')).toHaveText('All items dropped.')
+    await expect(page.getByTestId('dnd-dropped-list').locator('li')).toHaveCount(3)
+
+    await page.getByTestId('dnd-reset').click()
+
+    await expect(page.getByTestId('dnd-item-apple')).toBeVisible()
+    await expect(page.getByTestId('dnd-item-banana')).toBeVisible()
+    await expect(page.getByTestId('dnd-item-cherry')).toBeVisible()
+    await expect(page.getByTestId('dnd-dropped-list').locator('li')).toHaveCount(0)
+  })
 })
