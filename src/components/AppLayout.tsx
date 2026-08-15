@@ -33,6 +33,13 @@ export default function AppLayout() {
         >
           Message history
         </NavLink>
+        <NavLink
+          to="/playground"
+          className={navClass}
+          data-testid="nav-tab-playground"
+        >
+          Playground
+        </NavLink>
         <NavLink to="/help" className={navClass} data-testid="nav-tab-help">
           Help
         </NavLink>
