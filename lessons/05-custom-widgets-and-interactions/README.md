@@ -41,7 +41,7 @@ what makes them accessible to screen readers.
 on it directly, and is more precise than inferring state from a CSS class or
 from button text that might get restyled.
 
-## The same outcome, reached different ways
+## The same outcome, reached different ways — and the one that isn't
 
 The modal in this app closes — and records the same "cancelled" result —
 whether you click its Cancel button *or* click the backdrop behind it. Only
@@ -50,6 +50,23 @@ from bubbling to the backdrop) counts; `locator.click({ position })` lets
 you target a specific point inside an element's box, which is how the demo
 aims a click at the backdrop's corner instead of wherever the dialog happens
 to be centered.
+
+Escape *looks* like a third way to cancel, but the demo shows it isn't: the
+app's Escape handler only hides the dialog, it never runs the same
+`close('cancelled')` logic the other three paths share, so no result gets
+recorded at all. This is exactly the kind of assumption worth testing
+explicitly rather than inferring from "well, it behaves like Cancel
+everywhere else" — read the component, not just its obvious behavior.
+
+## Locating dynamic, list-shaped state
+
+Some widgets don't have a fixed set of `data-testid`s to hardcode — the
+calendar's day cells are named after the date they represent
+(`calendar-day-2026-08-15`), which changes every day. `[data-testid^="…"]`
+(an attribute-*starts-with* CSS selector) locates "some day cell, whichever
+one" when you don't know or care which one in advance; reading the matched
+element's own `data-testid` back out with `getAttribute` recovers the exact
+value the app used, so later assertions can be precise instead of vague.
 
 ## The screen for this lesson: Playground
 
@@ -76,9 +93,10 @@ Route: `/playground`. Several independent widgets, each in its own
 
 ## Now
 
-1. Read and run `demo.spec.ts` — it covers drag-and-drop, the slider, the
-   gallery's toggle state, the video player's controls, and two ways of
-   dismissing the modal.
-2. Open `homework.spec.ts` and complete both exercises described there —
-   same screen (Playground), the Calendar, Modal, and Filter widgets this
-   time.
+1. Read and run `demo.spec.ts` — it covers drag-and-drop (including
+   emptying and resetting the whole source list), the slider, the gallery's
+   toggle state, the video player's controls, and all three ways the modal
+   can close (Cancel, backdrop click, and the Escape-key exception).
+2. Open `homework.spec.ts` and complete all three exercises described there
+   — same screen (Playground), the Calendar, Modal, Filter, and Gallery
+   widgets this time.
