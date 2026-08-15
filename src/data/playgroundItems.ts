@@ -19,7 +19,4 @@ export const PLAYGROUND_ITEMS: PlaygroundItem[] = [
   { id: 'p3', title: 'Locator strategy guide', category: 'testing' },
   { id: 'p4', title: 'Color palette tokens', category: 'design' },
   { id: 'p5', title: 'Drag and drop board', category: 'frontend' },
-  { id: 'p6', title: 'Rate limiter', category: 'backend' },
-  { id: 'p7', title: 'Visual regression suite', category: 'testing' },
-  { id: 'p8', title: 'Empty state illustrations', category: 'design' },
 ]
