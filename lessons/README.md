@@ -16,7 +16,7 @@ starts `npm run dev` for you automatically and reuses it if it's already running
 
 Note: this app also supports talking to a real backend for non-"funny mode"
 replies and for **Reset Chat** (`POST /api/reset`). No backend is included in
-this repo, so `Reset Chat` won't visibly do anything until Lesson 8, where we
+this repo, so `Reset Chat` won't visibly do anything until Lesson 9, where we
 mock that API instead of running a real server. Everything before that uses
 "Funny mode" (on by default), which needs no backend at all.
 

@@ -15,9 +15,9 @@ time in a real browser. That's why every Playwright call is awaited.
 
 Throughout this course we test **this repository's own app** — the "AI
 Assistant Chat" demo (`src/`), built specifically for practicing Playwright.
-It's a small React chat UI with four screens: Chat, Search in chats, Message
-history, and Help. `lessons/playwright.config.ts` starts it for you, so you
-don't need a separate terminal running `npm run dev`.
+It's a small React chat UI with five screens: Chat, Search in chats, Message
+history, Playground, and Help. `lessons/playwright.config.ts` starts it for
+you, so you don't need a separate terminal running `npm run dev`.
 
 This lesson works with the **Chat screen** (`/`, the homepage). Send a
 message and the assistant replies — no backend required, because "Funny
