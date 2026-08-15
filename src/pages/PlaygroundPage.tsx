@@ -16,40 +16,63 @@ export default function PlaygroundPage() {
         locators, actions, and assertions beyond the Chat screens.
       </p>
 
-      <section className="widget-block" data-testid="playground-section-slider">
-        <h3 className="widget-block__heading">Slider</h3>
-        <VolumeSlider />
-      </section>
+      <div className="widget-grid">
+        <section
+          className="widget-block widget-block--slider"
+          data-testid="playground-section-slider"
+        >
+          <h3 className="widget-block__heading">Slider</h3>
+          <VolumeSlider />
+        </section>
 
-      <section className="widget-block" data-testid="playground-section-dnd">
-        <h3 className="widget-block__heading">Drag and drop</h3>
-        <DragAndDrop />
-      </section>
+        <section
+          className="widget-block widget-block--modal"
+          data-testid="playground-section-modal"
+        >
+          <h3 className="widget-block__heading">Modal window</h3>
+          <ConfirmModal />
+        </section>
 
-      <section className="widget-block" data-testid="playground-section-modal">
-        <h3 className="widget-block__heading">Modal window</h3>
-        <ConfirmModal />
-      </section>
+        <section
+          className="widget-block widget-block--calendar"
+          data-testid="playground-section-calendar"
+        >
+          <h3 className="widget-block__heading">Calendar</h3>
+          <EventCalendar />
+        </section>
 
-      <section className="widget-block" data-testid="playground-section-video">
-        <h3 className="widget-block__heading">Video player</h3>
-        <VideoPlayer />
-      </section>
+        <section
+          className="widget-block widget-block--gallery"
+          data-testid="playground-section-gallery"
+        >
+          <h3 className="widget-block__heading">Image gallery</h3>
+          <ImageGallery />
+        </section>
 
-      <section className="widget-block" data-testid="playground-section-calendar">
-        <h3 className="widget-block__heading">Calendar</h3>
-        <EventCalendar />
-      </section>
+        <section
+          className="widget-block widget-block--dnd"
+          data-testid="playground-section-dnd"
+        >
+          <h3 className="widget-block__heading">Drag and drop</h3>
+          <DragAndDrop />
+        </section>
 
-      <section className="widget-block" data-testid="playground-section-filter">
-        <h3 className="widget-block__heading">Filter</h3>
-        <ItemFilter />
-      </section>
+        <section
+          className="widget-block widget-block--filter"
+          data-testid="playground-section-filter"
+        >
+          <h3 className="widget-block__heading">Filter</h3>
+          <ItemFilter />
+        </section>
 
-      <section className="widget-block" data-testid="playground-section-gallery">
-        <h3 className="widget-block__heading">Image gallery</h3>
-        <ImageGallery />
-      </section>
+        <section
+          className="widget-block widget-block--video"
+          data-testid="playground-section-video"
+        >
+          <h3 className="widget-block__heading">Video player</h3>
+          <VideoPlayer />
+        </section>
+      </div>
     </div>
   )
 }
