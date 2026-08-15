@@ -24,7 +24,7 @@ Aimed at engineers who know JS/TypeScript and want to learn or teach Playwright 
 - **Optional real-backend path**: typed `fetch` client (`src/api/chatApi.ts`) for `GET /api/messages`, `POST /api/chat`, `POST /api/reset`, used when Funny mode is off.
 - **Client-side history**: persisted to `localStorage`, merging server and local exchanges with de-duplication.
 - **Page Object Model E2E suite** (`e2e/`): one page-object class per screen via a `PageManager`.
-- **Four-lesson Playwright course** (`01`–`04`): getting started, locators & actions, assertions & auto-waiting, forms & input.
+- **Four-lesson Playwright course**: getting started, locators & actions, assertions & auto-waiting, forms & input.
 - **Strict TypeScript** (`strict`, `noUnusedLocals`, `noUncheckedSideEffectImports`, …) and **GitHub Actions CI** (lint + build on push/PR to `main`).
 
 ## How It Works
