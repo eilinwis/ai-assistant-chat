@@ -60,15 +60,13 @@ npx playwright test --config=lessons/playwright.config.ts
 ## Getting Started
 
 ```bash
-git clone https://github.com/eilinwis/ai-assistant-chat.git
-cd ai-assistant-chat
 
 npm install
-npx playwright install chromium   # browser binary for Playwright
+npx playwright install chromium
 
-npm run dev       # http://localhost:5173
+npm run dev       
 npm run lint
-npm run build      # tsc -b + vite build
+npm run build
 npm run preview
 ```
 
