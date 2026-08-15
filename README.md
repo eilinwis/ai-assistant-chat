@@ -1,6 +1,6 @@
 # AI Assistant Chat
 
-This app is for educational purpuse. Learn e2e playwright testing!
+This app is for educational purpose. Learn e2e playwright testing!
 React + Vite + TypeScript chat UI for manual use and Playwright E2E tests.
 
 ## Setup
