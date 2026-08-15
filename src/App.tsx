@@ -4,6 +4,7 @@ import AppLayout from './components/AppLayout'
 import ChatPage from './pages/ChatPage'
 import HelpPage from './pages/HelpPage'
 import HistoryPage from './pages/HistoryPage'
+import PlaygroundPage from './pages/PlaygroundPage'
 import SearchChatsPage from './pages/SearchChatsPage'
 import './styles.css'
 
@@ -17,6 +18,7 @@ export default function App() {
               <Route path="/" element={<ChatPage />} />
               <Route path="/search" element={<SearchChatsPage />} />
               <Route path="/history" element={<HistoryPage />} />
+              <Route path="/playground" element={<PlaygroundPage />} />
               <Route path="/help" element={<HelpPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
