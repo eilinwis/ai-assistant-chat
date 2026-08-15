@@ -12,7 +12,7 @@ A React/TypeScript chat application built as a purpose-made target for practicin
 
 Two things, developed together:
 
-1. **A small chat web app** (`src/`) — four screens (Chat, Search, Message history, Help), client-side routing, local persistence, and a testable UI (`data-testid`s, predictable loading/disabled states).
+1. **A small chat web app** (`src/`) — client-side routing, local persistence, and a testable UI (`data-testid`s, predictable loading/disabled states).
 2. **A Playwright course** (`lessons/`) — lessons that use the app above as the system under test, each pairing an explanation with a working demo and a homework exercise.
 
 Aimed at engineers who know JS/TypeScript and want to learn or teach Playwright against a realistic small app. The codebase is exercised from two angles: a regression-style E2E suite (`e2e/`, Page Object Model) and the teaching suite (`lessons/`).
