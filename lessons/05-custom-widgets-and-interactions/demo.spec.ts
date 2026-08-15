@@ -1,0 +1,65 @@
+import { test, expect } from '@playwright/test'
+
+// Screen under test: Playground ("/playground") — hand-built widgets that
+// don't behave like plain text inputs: drag-and-drop, a range slider,
+// and toggle buttons.
+
+test.describe('Lesson 5: Custom widgets & complex interactions', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/playground')
+  })
+
+  test('dragging an item from the source list into the dropzone moves it', async ({ page }) => {
+    const apple = page.getByTestId('dnd-item-apple')
+    const resetButton = page.getByTestId('dnd-reset')
+
+    await expect(resetButton).toBeDisabled() // nothing dropped yet
+
+    await apple.dragTo(page.getByTestId('dnd-dropzone'))
+
+    await expect(page.getByTestId('dnd-dropped-apple')).toBeVisible()
+    // `apple` still points at the same data-testid — it now matches nothing,
+    // because the element was removed from the source list, not moved in place.
+    await expect(apple).toHaveCount(0)
+    await expect(resetButton).toBeEnabled()
+
+    await resetButton.click()
+    await expect(page.getByTestId('dnd-dropped-apple')).toHaveCount(0)
+    await expect(page.getByTestId('dnd-item-apple')).toBeVisible() // back in the source list
+  })
+
+  test('the volume slider responds to fill() and to real key presses', async ({ page }) => {
+    const slider = page.getByTestId('volume-slider')
+    await expect(slider).toHaveValue('50') // the default volume
+
+    await slider.fill('80')
+    await expect(slider).toHaveValue('80')
+
+    // fill() sets the value directly. Arrow keys exercise the browser's own
+    // range-input keyboard handling instead — a different code path, and
+    // one that only works once the element is actually focused.
+    await slider.focus()
+    await slider.press('ArrowLeft')
+    await slider.press('ArrowLeft')
+    await expect(slider).toHaveValue('78')
+
+    await page.getByTestId('volume-reset').click()
+    await expect(slider).toHaveValue('50')
+  })
+
+  test('gallery thumbnails track the active image via aria-pressed', async ({ page }) => {
+    const mainImage = page.getByTestId('gallery-main-image')
+    const heroThumb = page.getByTestId('gallery-thumb-hero')
+    const reactThumb = page.getByTestId('gallery-thumb-react')
+
+    await expect(heroThumb).toHaveAttribute('aria-pressed', 'true') // first image, active by default
+    await expect(reactThumb).toHaveAttribute('aria-pressed', 'false')
+
+    await reactThumb.click()
+
+    await expect(reactThumb).toHaveAttribute('aria-pressed', 'true')
+    await expect(heroThumb).toHaveAttribute('aria-pressed', 'false')
+    await expect(mainImage).toHaveAttribute('alt', 'React logo')
+    await expect(page.getByTestId('gallery-caption')).toHaveText('React logo')
+  })
+})
