@@ -83,7 +83,7 @@ grouped by day:
   whenever there's no history yet, enabled once there is at least one
   exchange. We only check this button's state in this lesson; clicking it
   opens a native `confirm()` dialog, which needs a technique we haven't
-  covered yet (that's Lesson 7).
+  covered yet (that's Lesson 8).
 - Each entry: `<li class="history-day__item">`, with the same
   `.history-exchange__text` structure you saw on the Search screen (message,
   then reply) and a day heading `.history-day__title` (e.g. "Tuesday, August
