@@ -32,7 +32,6 @@ test.describe('Chat', () => {
     await chat.sendMessage()
     await expect(chat.chatMessageFirst).toBeVisible()
     await expect(chat.chatMessageFirstReply).toBeVisible()
-    await page.waitForTimeout(1000)
     expect(await chat.getChatMessageFirstText()).toBe(MESSAGE)
     expect(await chat.getChatMessageFirstReplyText()).toBe(REPLY)
   })
