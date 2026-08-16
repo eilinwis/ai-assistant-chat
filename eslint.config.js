@@ -20,4 +20,13 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    // Playwright test files, not React components/hooks — the react-hooks
+    // rules don't apply here and produce false positives (e.g. a fixture's
+    // `use` callback parameter reads as a call to the "use" hook).
+    files: ['e2e/**/*.{ts,tsx}', 'lessons/**/*.{ts,tsx}'],
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+    },
+  },
 ])
