@@ -34,8 +34,11 @@ export class ChatPage {
       .locator('.chat-message--user')
       .first()
       .locator('.chat-message__bubble')
+    // Exclude .chat-message--loading: the "Thinking…" placeholder shares
+    // .chat-message--assistant with the real reply while it's pending, so
+    // an unqualified first() can transiently match the placeholder instead.
     this.chatMessageFirstReply = page
-      .locator('.chat-message--assistant')
+      .locator('.chat-message--assistant:not(.chat-message--loading)')
       .first()
       .locator('.chat-message__bubble')
   }
