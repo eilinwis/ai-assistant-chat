@@ -21,7 +21,7 @@ belongs to.
 
 ## Opening more tabs and contexts
 
-- `context.newPage()` — a new tab in the **same** context. Same storage as
+- `context.newPage()`— a new tab in the **same** context. Same storage as
   every other page in it.
 - `browser.newContext()` — a whole new, empty context: no cookies, no
   storage. `await context.newPage()` on *that* gives you a page starting
