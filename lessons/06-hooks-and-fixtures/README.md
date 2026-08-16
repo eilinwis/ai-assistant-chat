@@ -15,7 +15,6 @@ You've used `test.describe` since Lesson 1 just to group tests. It also
 scopes hooks:
 
 - `test.beforeEach(fn)` runs `fn` before every test in its `describe` block
-  (or the whole file, if declared outside any `describe`).
 - `test.afterEach(fn)` runs after every test, **whether it passed or
   failed** — the one place you can reliably do "no matter what happened,
   also do this."
