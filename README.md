@@ -1,4 +1,4 @@
-# AI Assistant Chat
+# AI Assistant Chat 💬💻 ✅
 
 ![CI](https://github.com/eilinwis/ai-assistant-chat/actions/workflows/ci.yml/badge.svg)
 ![GitHub Repo stars](https://img.shields.io/github/stars/eilinwis/ai-assistant-chat?style=flat-square&color=ffa500)
