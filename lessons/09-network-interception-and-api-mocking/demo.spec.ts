@@ -30,7 +30,6 @@ test.describe('Lesson 9: Network interception & API mocking', () => {
     )
 
     await page.goto('/')
-
     await expect(page.getByTestId('message-user').first()).toHaveText('What is Playwright?')
     await expect(page.getByTestId('message-assistant').first()).toHaveText(
       'A framework for testing web apps.',
@@ -41,13 +40,11 @@ test.describe('Lesson 9: Network interception & API mocking', () => {
     page,
   }) => {
     await page.route('**/api/messages', (route) => route.fulfill({ json: { messages: [] } }))
-
     await page.goto('/')
-
     await expect(page.getByText('No messages yet.')).toBeVisible()
   })
 
-  test('with funny mode off, sending a message hits POST /api/chat — mocked here — and waitForResponse observes it', async ({
+  test('with funny mode off, sending a message hits POST /api/chat mocked here and waitForResponse observes it', async ({
     page,
   }) => {
     await page.route('**/api/messages', (route) => route.fulfill({ json: { messages: [] } }))
@@ -86,14 +83,11 @@ test.describe('Lesson 9: Network interception & API mocking', () => {
   test('a failed POST /api/chat shows the app\'s own error message', async ({ page }) => {
     await page.route('**/api/messages', (route) => route.fulfill({ json: { messages: [] } }))
     await page.route('**/api/chat', (route) => route.fulfill({ status: 500, json: { error: 'boom' } }))
-
     await page.goto('/')
     await expect(page.getByTestId('chat-input')).toBeEnabled({ timeout: 15_000 })
     await page.getByTestId('funny-mode-toggle').uncheck()
-
     await page.getByTestId('chat-input').fill('trigger a failure')
     await page.getByTestId('send-button').click()
-
     await expect(page.getByTestId('error-message')).toHaveText('Error: failed to get AI response')
   })
 })
