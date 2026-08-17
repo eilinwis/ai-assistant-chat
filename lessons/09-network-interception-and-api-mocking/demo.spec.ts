@@ -1,9 +1,7 @@
 import { test, expect } from '@playwright/test'
 
-// Screen under test: Chat ("/"). Every earlier lesson used "Funny mode" (on
-// by default) specifically to avoid needing a backend. This lesson goes the
-// other way: no real backend exists in this repo, so instead of running one,
-// we intercept the requests the app makes and answer them ourselves.
+// Screen under test: Chat ("/"). Every earlier lesson used "Funny mode" (on by default) specifically to avoid needing a backend. This lesson goes the
+// other way: no real backend exists in this repo, so instead of running one,we intercept the requests the app makes and answer them ourselves.
 
 test.describe('Lesson 9: Network interception & API mocking', () => {
   test('mocking GET /api/messages seeds the chat with fixed history', async ({ page }) => {
