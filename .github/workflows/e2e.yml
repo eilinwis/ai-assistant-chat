@@ -6,6 +6,7 @@ name: e2e
 on:
   issue_comment:
     types: [created]
+    branches: [main]
 
 jobs:
   run-spec:
