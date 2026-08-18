@@ -71,6 +71,6 @@ test.describe('Lesson 10: Debugging & visual tools', () => {
 
     const videoPath = await recordingPage.video()?.path()
     expect(videoPath).toBeTruthy()
-    expect(fs.existsSync(videoPath!)).toBe(true)
+    expect(fs.existsSync(videoPath)).toBe(true)
   })
 })
