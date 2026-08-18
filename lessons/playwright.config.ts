@@ -14,7 +14,10 @@ export default defineConfig({
   testDir: './',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: 0,
+  // See Lesson 11: retry only in CI, where a failure is more likely to be a
+  // real, environment-specific flake than something to fix and re-run by
+  // hand — locally, a clean single failure is more useful than a masked one.
+  retries: process.env.CI ? 2 : 0,
   workers: 1,
   reporter: 'html',
   use: {
