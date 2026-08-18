@@ -86,6 +86,7 @@ test.describe('Lesson 6: Hooks & fixtures', () => {
 
     test('both messages show up grouped under today, and delete is enabled', async ({ page }) => {
       await expect(page.locator('li.history-day__item')).toHaveCount(2)
+      
       await expect(page.getByTestId('delete-history-button')).toBeEnabled()
     })
 
