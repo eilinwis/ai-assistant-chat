@@ -1,0 +1,57 @@
+name: e2e
+
+# Comment on a PR: "e2e <path/to/spec.ts>" runs only that spec file.
+# A bare "e2e", or anything not matching that exact shape, runs nothing.
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  run-spec:
+    if: github.event.issue.pull_request != null
+    runs-on: ubuntu-latest
+    steps:
+      - name: Parse comment for "e2e <spec path>"
+        id: parse
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        run: |
+          TRIMMED="$(printf '%s' "$COMMENT_BODY" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+          if [[ "$TRIMMED" =~ ^e2e[[:space:]]+([^[:space:]]+)$ ]]; then
+            echo "spec=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "spec=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout PR head
+        if: steps.parse.outputs.spec != ''
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
+
+      - name: Set up Node.js
+        if: steps.parse.outputs.spec != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.parse.outputs.spec != ''
+        run: npm ci
+
+      - name: Install Playwright browsers
+        if: steps.parse.outputs.spec != ''
+        run: npx playwright install --with-deps chromium
+
+      - name: Run the requested spec file
+        if: steps.parse.outputs.spec != ''
+        env:
+          SPEC: ${{ steps.parse.outputs.spec }}
+        run: |
+          if [[ "$SPEC" == lessons/* ]]; then
+            npx playwright test --config=lessons/playwright.config.ts "$SPEC"
+          else
+            npx playwright test "$SPEC"
+          fi
