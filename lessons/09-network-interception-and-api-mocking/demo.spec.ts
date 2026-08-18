@@ -31,6 +31,7 @@ test.describe('Lesson 9: Network interception & API mocking', () => {
 
     await page.goto('/')
     await expect(page.getByTestId('message-user').first()).toHaveText('What is Playwright?')
+    
     await expect(page.getByTestId('message-assistant').first()).toHaveText(
       'A framework for testing web apps.',
     )
