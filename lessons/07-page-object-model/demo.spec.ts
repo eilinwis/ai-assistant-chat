@@ -7,7 +7,7 @@ import { SearchPage } from './pages/SearchPage'
 // named locators and methods on page objects, injected here through the
 // custom fixtures Lesson 6 introduced.
 
-type Fixtures = {
+interface Fixtures {
   chatPage: ChatPage
   searchPage: SearchPage
 }

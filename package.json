@@ -8,6 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:lessons": "playwright test --config=lessons/playwright.config.ts",
     "preview": "vite preview"
   },
   "dependencies": {
