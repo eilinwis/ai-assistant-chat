@@ -1,12 +1,16 @@
 name: e2e
 
-# Comment on a PR: "e2e <path/to/spec.ts>" runs only that spec file.
+# Comment on a PR: "e2e <path/to/spec.ts>" runs only that spec file, and
+# reports back as a check on the PR's head commit.
 # A bare "e2e", or anything not matching that exact shape, runs nothing.
 
 on:
   issue_comment:
     types: [created]
-    branches: [main]
+
+permissions:
+  pull-requests: read
+  statuses: write
 
 jobs:
   run-spec:
@@ -24,6 +28,30 @@ jobs:
           else
             echo "spec=" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Resolve PR head commit
+        if: steps.parse.outputs.spec != ''
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SHA=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}" --jq .head.sha)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+
+      # This is what makes the run show up under the PR's "Checks" — a
+      # commit status posted against the PR's own head SHA. issue_comment
+      # runs aren't tied to a commit on their own, so without this the run
+      # only shows in the repo's Actions tab, never on the PR itself.
+      - name: Mark check as pending
+        if: steps.parse.outputs.spec != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/${{ github.repository }}/statuses/${{ steps.pr.outputs.sha }}" \
+            -f state=pending \
+            -f context="e2e" \
+            -f description="Running ${{ steps.parse.outputs.spec }}" \
+            -f target_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Checkout PR head
         if: steps.parse.outputs.spec != ''
@@ -48,6 +76,7 @@ jobs:
 
       - name: Run the requested spec file
         if: steps.parse.outputs.spec != ''
+        id: run
         env:
           SPEC: ${{ steps.parse.outputs.spec }}
         run: |
@@ -56,3 +85,19 @@ jobs:
           else
             npx playwright test "$SPEC"
           fi
+
+      - name: Mark check with the result
+        if: ${{ always() && steps.parse.outputs.spec != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ steps.run.outcome }}" = "success" ]; then
+            STATE=success
+          else
+            STATE=failure
+          fi
+          gh api "repos/${{ github.repository }}/statuses/${{ steps.pr.outputs.sha }}" \
+            -f state="$STATE" \
+            -f context="e2e" \
+            -f description="${{ steps.parse.outputs.spec }}" \
+            -f target_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
