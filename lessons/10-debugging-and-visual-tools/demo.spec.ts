@@ -1,10 +1,18 @@
 import fs from 'node:fs'
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 // Screen under test: Chat ("/"). This lesson isn't about the screen at
 // all — it's about the evidence Playwright can capture *while* a test
 // runs, so you (or a teammate looking at a CI failure) can see what
 // actually happened.
+
+async function readVideoPath(page: Page): Promise<string> {
+  const video = page.video()
+  if (!video) {
+    throw new Error('Expected recordVideo to attach a video to the page')
+  }
+  return video.path()
+}
 
 test.describe('Lesson 10: Debugging & visual tools', () => {
   test('context.tracing.start()/stop() produces a trace you can open with npx playwright show-trace', async ({
@@ -69,8 +77,7 @@ test.describe('Lesson 10: Debugging & visual tools', () => {
     // close — reading the path any earlier would race the encoder.
     await recordingContext.close()
 
-    const videoPath = await recordingPage.video()?.path()
-    expect(videoPath).toBeTruthy()
+    const videoPath = await readVideoPath(recordingPage)
     expect(fs.existsSync(videoPath)).toBe(true)
   })
 })
