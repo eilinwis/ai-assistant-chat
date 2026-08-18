@@ -1,6 +1,7 @@
 # AI Assistant Chat 💬
 
 ![CI](https://github.com/eilinwis/ai-assistant-chat/actions/workflows/ci.yml/badge.svg)
+![E2E Tests](https://github.com/eilinwis/ai-assistant-chat/actions/workflows/e2e-tests.yml/badge.svg)
 ![GitHub Repo stars](https://img.shields.io/github/stars/eilinwis/ai-assistant-chat?style=flat-square&color=ffa500)
 ![GitHub Repo contributors](https://img.shields.io/github/contributors/eilinwis/ai-assistant-chat?style=flat-square&color=ffa500)
 ![GitHub Repo forks](https://img.shields.io/github/forks/eilinwis/ai-assistant-chat?style=flat-square&color=ffa500)
@@ -25,7 +26,7 @@ Aimed at engineers who know JS/TypeScript and want to learn or teach Playwright 
 - **Client-side history**: persisted to `localStorage`, merging server and local exchanges with de-duplication.
 - **Page Object Model E2E suite** (`e2e/`): one page-object class per screen via a `PageManager`.
 - **Four-lesson Playwright course**: getting started, locators & actions, assertions & auto-waiting, forms & input.
-- **Strict TypeScript** (`strict`, `noUnusedLocals`, `noUncheckedSideEffectImports`, …) and **GitHub Actions CI** (lint + build on push/PR to `main`).
+- **Strict TypeScript** (`strict`, `noUnusedLocals`, `noUncheckedSideEffectImports`, …) and **GitHub Actions CI**: `ci.yml` (lint + build) and `e2e-tests.yml` (both Playwright suites, in parallel jobs), both on push/PR to `main`.
 
 ## How It Works
 
@@ -46,16 +47,27 @@ The `lessons/` flow: read the lesson README → run `demo.spec.ts` → implement
 
 Two independent Playwright suites:
 
-- **`e2e/` (regression, POM)** — root `playwright.config.ts`, Chromium, headed. `PageManager` exposes one page object per screen. Covers: chat controls render + send flow (`chat.spec.ts`), search retrieval (`search.spec.ts`), nav tabs visible (`navigation.spec.ts`), Help accordion toggling (`help.spec.ts`). Uses web-first `expect(locator)` assertions and readiness-based waits over arbitrary sleeps.
-- **`lessons/` (teaching)** — own config with `baseURL` + auto-started `webServer`. Each of the four lessons has a working `demo.spec.ts` and a `test.fixme()`-gated `homework.spec.ts`.
+- **`e2e/` (regression, POM)** — root `playwright.config.ts`, Chromium, headed locally / headless in CI, auto-started `webServer`. `PageManager` exposes one page object per screen. Covers: chat controls render + send flow (`chat.spec.ts`), search retrieval (`search.spec.ts`), nav tabs visible (`navigation.spec.ts`), Help accordion toggling (`help.spec.ts`). Uses web-first `expect(locator)` assertions and readiness-based waits over arbitrary sleeps.
+- **`lessons/` (teaching)** — own config, same `baseURL` + auto-started `webServer` pattern. Each lesson has a working `demo.spec.ts` and a `test.fixme()`-gated `homework.spec.ts`.
+
+Both configs start the dev server for you — no need to run `npm run dev` in a separate terminal first.
 
 ```bash
-# e2e/ suite (dev server must already be running)
-npm run dev && npx playwright test
+# e2e/ suite
+npm run test:e2e
 
-# lessons/ course (starts the dev server for you)
-npx playwright test --config=lessons/playwright.config.ts
+# lessons/ course
+npm run test:lessons
+
+# either one, scoped to a single file (or run `npx playwright ...` directly for full flag access)
+npm run test:e2e -- e2e/tests/chat.spec.ts
+npm run test:lessons -- lessons/01-getting-started
+
+# open the last run's HTML report
+npx playwright show-report
 ```
+
+Both suites also run in CI on every push/PR to `main` — see `.github/workflows/e2e-tests.yml`.
 
 ## Getting Started
 
@@ -76,7 +88,9 @@ Tests: see [Testing Strategy](#testing-strategy) above.
 
 ```
 ai-assistant-chat/
-├── .github/workflows/ci.yml   # lint + build on push/PR to main
+├── .github/workflows/
+│   ├── ci.yml                  # lint + build on push/PR to main
+│   └── e2e-tests.yml           # e2e/ + lessons/ Playwright suites, in parallel jobs
 ├── src/
 │   ├── api/chatApi.ts         # client for the optional external backend
 │   ├── components/            # AppLayout, ChatWindow, ChatInput, ChatMessage, ...
