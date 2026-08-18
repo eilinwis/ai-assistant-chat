@@ -1,4 +1,4 @@
-name: E2E on Comment
+name: e2e
 
 # Comment on a PR: "e2e <path/to/spec.ts>" runs only that spec file.
 # A bare "e2e", or anything not matching that exact shape, runs nothing.
