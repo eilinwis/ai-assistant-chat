@@ -67,6 +67,7 @@ test.describe('Lesson 6: Hooks & fixtures', () => {
 
   test('a fixture composes with plain page actions in the same test', async ({ sendMessage, page }) => {
     await sendMessage('Ducks like bread')
+    
     await sendMessage('Programmers unite')
 
     await page.getByTestId('nav-tab-history').click()
