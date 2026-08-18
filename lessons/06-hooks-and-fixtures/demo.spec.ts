@@ -6,7 +6,7 @@ import { test as base, expect } from '@playwright/test'
 // things, using hooks and fixtures instead of a hand-rolled helper function
 // called manually in every test.
 
-type Fixtures = {
+interface Fixtures {
   sendMessage: (text: string) => Promise<void>
   failOnPageErrors: void
 }

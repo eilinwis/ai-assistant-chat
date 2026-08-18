@@ -88,7 +88,7 @@ test.describe('Lesson 5: Custom widgets & complex interactions', () => {
     await page.getByTestId('modal-open-button').click()
     await expect(dialog).toBeVisible()
     await page.getByTestId('modal-cancel-button').click()
-    await expect(dialog).not.toBeVisible()
+    await expect(dialog).toBeHidden()
     await expect(page.getByTestId('modal-result')).toHaveText('Last action: cancelled')
 
     // A click that lands on the backdrop itself — not on the dialog it wraps
@@ -97,7 +97,7 @@ test.describe('Lesson 5: Custom widgets & complex interactions', () => {
     await page.getByTestId('modal-open-button').click()
     await expect(dialog).toBeVisible()
     await page.getByTestId('modal-backdrop').click({ position: { x: 5, y: 5 } })
-    await expect(dialog).not.toBeVisible()
+    await expect(dialog).toBeHidden()
     await expect(page.getByTestId('modal-result')).toHaveText('Last action: cancelled')
   })
 
@@ -113,7 +113,7 @@ test.describe('Lesson 5: Custom widgets & complex interactions', () => {
 
     await page.keyboard.press('Escape')
 
-    await expect(dialog).not.toBeVisible()
+    await expect(dialog).toBeHidden()
     await expect(page.getByTestId('modal-result')).toHaveCount(0) // no "Last action" line at all
   })
 

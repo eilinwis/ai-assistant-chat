@@ -10,8 +10,6 @@ test.describe('Navigation', () => {
     page,
   }) => {
     const pageManager = new PageManager(page)
-    await page.waitForTimeout(5000);
     await pageManager.onAppLayout().expectMainNavigationTabsVisible()
-    await page.waitForTimeout(5000);
-})
+  })
 })
