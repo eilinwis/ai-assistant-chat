@@ -88,9 +88,12 @@ export default function ChatWindow() {
 
   const handleReset = useCallback(async () => {
     setError(null)
+    // Clear the on-screen thread immediately — don't gate it on the backend
+    // call below, since this app runs perfectly well with no backend at all
+    // (Funny mode). Best-effort notify a real backend if one is configured.
+    setMessages([])
     try {
       await resetChat()
-      setMessages([])
     } catch {
       void 0
     }
