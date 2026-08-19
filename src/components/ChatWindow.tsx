@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { fetchMessages, resetChat, sendChatMessage } from '../api/chatApi'
 import { useChatHistory } from '../hooks/useChatHistory'
-import { getAppAssistantReply } from '../lib/appAssistantReply'
+import { getAppAssistantReply, HELP_SUGGESTION_MESSAGE } from '../lib/appAssistantReply'
 import {
   createFunnyAssistantMessage,
   getFunnyReplyContent,
@@ -55,13 +55,19 @@ export default function ChatWindow() {
   }, [mergeServerMessages])
 
   const handleSend = useCallback(
-    async (text: string) => {
+    async (text: string, options?: { forceAssistantMode?: boolean }) => {
       setError(null)
       const userMessage = createUserMessage(text)
       setMessages((prev) => [...prev, userMessage])
       setLoading(true)
 
-      if (funnyMode) {
+      // Read from `options` rather than assuming a just-called setFunnyMode
+      // has already taken effect — state updates aren't visible to this
+      // closure until the next render, so this local override avoids a race
+      // between "switch to assistant mode" and "send" happening together.
+      const useFunnyMode = options?.forceAssistantMode ? false : funnyMode
+
+      if (useFunnyMode) {
         try {
           await new Promise((r) => setTimeout(r, FUNNY_REPLY_DELAY_MS))
           const replyContent = getAppAssistantReply(text) ?? getFunnyReplyContent(text)
@@ -111,6 +117,15 @@ export default function ChatWindow() {
     }
   }, [])
 
+  const handleHelpSuggestion = useCallback(() => {
+    // The Help menu only makes sense in Assistant mode (Funny mode would
+    // just joke about it) — switch the toggle for next time, and force this
+    // one send into assistant mode regardless of whether that switch has
+    // been applied to state yet.
+    setFunnyMode(false)
+    void handleSend(HELP_SUGGESTION_MESSAGE, { forceAssistantMode: true })
+  }, [handleSend])
+
   return (
     <div className="chat-window">
       <label className="chat-mode">
@@ -149,6 +164,17 @@ export default function ChatWindow() {
           {error}
         </p>
       )}
+      <div className="chat-suggestions">
+        <button
+          type="button"
+          className="chat-suggestion"
+          data-testid="help-suggestion"
+          onClick={handleHelpSuggestion}
+          disabled={loading || !historyReady}
+        >
+          Help
+        </button>
+      </div>
       <ChatInput onSend={handleSend} disabled={loading || !historyReady} />
       <button
         type="button"

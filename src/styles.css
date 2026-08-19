@@ -398,6 +398,32 @@ body {
   margin: 0.75rem -1rem;
 }
 
+.chat-suggestions {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.chat-suggestion {
+  font: inherit;
+  font-size: 0.82rem;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+  cursor: pointer;
+}
+
+.chat-suggestion:hover:not(:disabled) {
+  background: #dbeafe;
+}
+
+.chat-suggestion:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .chat-window__list {
   max-height: 22rem;
   overflow-y: auto;

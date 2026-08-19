@@ -130,3 +130,34 @@ describe('ChatWindow normal mode (funny mode off) fallback', () => {
     expect(screen.queryByTestId('message-assistant')).not.toBeInTheDocument()
   })
 })
+
+describe('ChatWindow Help suggestion', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    vi.mocked(sendChatMessage).mockReset()
+    vi.mocked(sendChatMessage).mockRejectedValue(new Error('network error'))
+  })
+
+  afterEach(() => {
+    cleanup()
+  })
+
+  it('switches the toggle to Assistant mode and shows the question menu, even while Funny mode is on', async () => {
+    const user = userEvent.setup()
+    renderChatWindow()
+
+    const funnyModeToggle = await screen.findByTestId('funny-mode-toggle')
+    await waitFor(() => expect(funnyModeToggle).toBeEnabled())
+    expect(funnyModeToggle).toBeChecked() // Funny mode is on by default
+
+    await user.click(screen.getByTestId('help-suggestion'))
+
+    await waitFor(() => expect(funnyModeToggle).not.toBeChecked())
+    await waitFor(() =>
+      expect(screen.getByTestId('message-assistant')).toHaveTextContent(
+        "Here's what I know how to answer",
+      ),
+    )
+    expect(screen.getByTestId('message-user')).toHaveTextContent('Help')
+  })
+})

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getAppAssistantReply } from './appAssistantReply'
+import { getAppAssistantReply, HELP_SUGGESTION_MESSAGE } from './appAssistantReply'
 
 describe('getAppAssistantReply', () => {
   it('returns null for a plain statement (no question mark)', () => {
@@ -59,5 +59,24 @@ describe('getAppAssistantReply', () => {
 
   it('answers honestly when asked whether it is a real AI', () => {
     expect(getAppAssistantReply('Are you a real AI?')).toMatch(/not a real AI/)
+  })
+
+  it('lists every example question when sent the exact Help suggestion message', () => {
+    expect(HELP_SUGGESTION_MESSAGE).toBe('Help')
+
+    const reply = getAppAssistantReply('Help')
+    expect(reply).toMatch(/How does reset work\?/)
+    expect(reply).toMatch(/What is funny mode\?/)
+    expect(reply).toMatch(/Are you a real AI\?/)
+
+    // Case-insensitive, and works with surrounding whitespace.
+    expect(getAppAssistantReply('help')).toBe(reply)
+    expect(getAppAssistantReply('  Help  ')).toBe(reply)
+  })
+
+  it('does not treat "Help" as a question needing "?" to match', () => {
+    // Every other topic requires "?" — the Help menu is the one deliberate
+    // exception, since it's sent by a button click, not typed as a question.
+    expect(getAppAssistantReply('Help')).not.toBeNull()
   })
 })
