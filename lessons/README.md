@@ -1,8 +1,7 @@
 # Playwright Testing Course
 
 11 lessons, "what is Playwright" to CI-ready end-to-end tests, using this
-repo's own chat app as the system under test. Difficulty increases lesson
-over lesson.
+repo's own chat app as the system under test.
 
 ## Setup
 
@@ -46,6 +45,6 @@ run: `npx playwright show-report`.
 2. Solve the lesson's `homework.spec.ts` and delete its `test.fixme()`.
 3. Run it locally until it passes.
 4. Commit and push the branch.
-5. Open a PR.
+5. Open a PR with <[homework] lesson <NN>> .
 6. Comment on the PR: `e2e lessons/<lesson-folder>/homework.spec.ts` — CI
    runs just that file and reports back as a check on the PR.

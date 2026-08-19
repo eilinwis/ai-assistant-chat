@@ -80,8 +80,6 @@ npm run build
 npm run preview
 ```
 
-Tests: see [Testing Strategy](#testing-strategy) above.
-
 ## Project Structure
 
 ```
