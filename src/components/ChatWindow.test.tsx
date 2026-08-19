@@ -10,7 +10,7 @@ vi.mock('../api/chatApi', () => ({
   resetChat: vi.fn(),
 }))
 
-import { resetChat } from '../api/chatApi'
+import { resetChat, sendChatMessage } from '../api/chatApi'
 
 function renderChatWindow() {
   render(
@@ -79,5 +79,54 @@ describe('ChatWindow reset behavior', () => {
     await user.click(screen.getByTestId('reset-button'))
 
     await waitFor(() => expect(resetChat).toHaveBeenCalledTimes(1))
+  })
+})
+
+describe('ChatWindow normal mode (funny mode off) fallback', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    vi.mocked(sendChatMessage).mockReset()
+  })
+
+  afterEach(() => {
+    cleanup()
+  })
+
+  it('answers a recognized question locally when the real API call fails', async () => {
+    vi.mocked(sendChatMessage).mockRejectedValue(new Error('network error'))
+    const user = userEvent.setup()
+    renderChatWindow()
+
+    const input = await screen.findByTestId('chat-input')
+    await waitFor(() => expect(input).toBeEnabled())
+    await user.click(screen.getByTestId('funny-mode-toggle'))
+
+    await user.type(input, 'How does reset work?')
+    await user.click(screen.getByTestId('send-button'))
+
+    await waitFor(() =>
+      expect(screen.getByTestId('message-assistant')).toHaveTextContent('Reset Chat clears'),
+    )
+    expect(screen.queryByTestId('error-message')).not.toBeInTheDocument()
+  })
+
+  it('still shows the error message for an unrecognized failure', async () => {
+    vi.mocked(sendChatMessage).mockRejectedValue(new Error('network error'))
+    const user = userEvent.setup()
+    renderChatWindow()
+
+    const input = await screen.findByTestId('chat-input')
+    await waitFor(() => expect(input).toBeEnabled())
+    await user.click(screen.getByTestId('funny-mode-toggle'))
+
+    await user.type(input, 'trigger a failure')
+    await user.click(screen.getByTestId('send-button'))
+
+    await waitFor(() =>
+      expect(screen.getByTestId('error-message')).toHaveTextContent(
+        'Error: failed to get AI response',
+      ),
+    )
+    expect(screen.queryByTestId('message-assistant')).not.toBeInTheDocument()
   })
 })

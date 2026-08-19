@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { fetchMessages, resetChat, sendChatMessage } from '../api/chatApi'
 import { useChatHistory } from '../hooks/useChatHistory'
+import { getAppAssistantReply } from '../lib/appAssistantReply'
 import {
   createFunnyAssistantMessage,
   getFunnyReplyContent,
@@ -63,7 +64,7 @@ export default function ChatWindow() {
       if (funnyMode) {
         try {
           await new Promise((r) => setTimeout(r, FUNNY_REPLY_DELAY_MS))
-          const replyContent = getFunnyReplyContent(text)
+          const replyContent = getAppAssistantReply(text) ?? getFunnyReplyContent(text)
           const reply = createFunnyAssistantMessage(text, replyContent)
           setMessages((prev) => [...prev, reply])
           recordSuccessfulExchange(userMessage, reply)
@@ -78,7 +79,18 @@ export default function ChatWindow() {
         setMessages((prev) => [...prev, reply])
         recordSuccessfulExchange(userMessage, reply)
       } catch {
-        setError('Error: failed to get AI response')
+        // No real backend is configured (or it failed) — fall back to the
+        // local app assistant for recognized questions, same as funny mode
+        // does, instead of just erroring. Only applies when it actually
+        // recognizes the message; anything else still surfaces the error.
+        const fallbackContent = getAppAssistantReply(text)
+        if (fallbackContent) {
+          const reply = createFunnyAssistantMessage(text, fallbackContent)
+          setMessages((prev) => [...prev, reply])
+          recordSuccessfulExchange(userMessage, reply)
+        } else {
+          setError('Error: failed to get AI response')
+        }
       } finally {
         setLoading(false)
       }
@@ -101,15 +113,23 @@ export default function ChatWindow() {
 
   return (
     <div className="chat-window">
-      <label className="chat-funny">
+      <label className="chat-mode">
         <input
           type="checkbox"
           data-testid="funny-mode-toggle"
           checked={funnyMode}
           onChange={(e) => setFunnyMode(e.target.checked)}
           disabled={loading || !historyReady}
+          className="chat-mode__checkbox"
         />
-        <span>Funny mode</span>
+        <span className={`chat-mode__track${funnyMode ? ' chat-mode__track--funny' : ''}`}>
+          <span className={`chat-mode__option${!funnyMode ? ' chat-mode__option--active' : ''}`}>
+            Assistant mode
+          </span>
+          <span className={`chat-mode__option${funnyMode ? ' chat-mode__option--active' : ''}`}>
+            Funny mode
+          </span>
+        </span>
       </label>
       <div className="chat-window__list">
         {!historyReady && (
