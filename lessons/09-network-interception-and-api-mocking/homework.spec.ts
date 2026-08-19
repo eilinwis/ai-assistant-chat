@@ -23,7 +23,12 @@ test.describe('Homework 9: Network interception & API mocking', () => {
    *      fill+click flow (funny mode stays on — no need to mock
    *      POST /api/chat for this test) and wait for the assistant reply to
    *      appear.
-   *   4. Click data-testid="reset-button".
+   *   4. Click data-testid="reset-button" — clicking it clears the on-screen
+   *      thread immediately either way (it doesn't wait on the network
+   *      call), so pair the click with `page.waitForResponse('**\/api/reset')`
+   *      (same `Promise.all([...])` shape demo.spec.ts uses for
+   *      POST /api/chat) to actually confirm *your mock* was hit, and
+   *      assert its status is 200.
    *   5. Assert there are 0 data-testid="message-user" elements, 0
    *      data-testid="message-assistant" elements, and that "No messages
    *      yet." is visible again.
