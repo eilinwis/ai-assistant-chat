@@ -3,7 +3,7 @@ import { test } from '@playwright/test'
 /**
  * Homework 2 — Locators & actions
  *
- * Screen under test: Search in chats — the same screen as demo.spec.ts,
+ * Screen under test: Search — the same screen as demo.spec.ts,
  * at "/search".
  *
  * Complete the test below:

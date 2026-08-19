@@ -18,7 +18,7 @@ test.describe('Search', () => {
     await pageManager.onSearchPage().expectSearchHeaderVisible()
     await pageManager.onSearchPage().expectSearchResultsVisible()
     const headerText = await pageManager.onSearchPage().getHeaderText()
-    expect(headerText).toContain('Search in chats')
+    expect(headerText).toContain('Search')
     const firstSearchResultText = await pageManager.onSearchPage().getFirstSearchResultText()
     expect(firstSearchResultText).toContain(SEARCHED_MESSAGE)
     const firstSearchResultReplyText = await pageManager.onSearchPage().getFirstSearchResultReplyText()
