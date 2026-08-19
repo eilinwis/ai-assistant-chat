@@ -10,14 +10,6 @@ npm install
 npx playwright install chromium
 ```
 
-No need to start the dev server yourself — `lessons/playwright.config.ts`
-does it for you.
-
-Note: non-funny-mode replies and **Reset Chat** need a real backend, which
-this repo doesn't include — that's the point of Lesson 9 (mocking the API
-instead of running a server). Everything before that runs on "Funny mode"
-alone.
-
 ## Each lesson
 
 - `README.md` — theory

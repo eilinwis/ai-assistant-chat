@@ -9,6 +9,8 @@
 
 A React/TypeScript chat application built as a purpose-made target for practicing Playwright end-to-end testing, paired with a self-contained, in-repo Playwright course that teaches E2E testing against it.
 
+**No real AI ships by default** — "Funny mode" is a small, deterministic reply engine (canned jokes, plus real answers to real questions about the app itself — try asking it "how does reset work?"). The name is earned *architecturally*, not by a live model: `src/api/chatApi.ts` already implements the full request/response contract (`GET /api/messages`, `POST /api/chat`, `POST /api/reset`) a real LLM backend would need — it's AI-ready, just not AI-connected, by design, so the app and every test stay free, offline, and deterministic.
+
 ## Overview
 
 Two things, developed together:
@@ -22,7 +24,8 @@ Aimed at engineers who know JS/TypeScript and want to learn or teach Playwright 
 
 - **Four-screen chat app**: Chat, Search (full-text over local history), Message history (by day), Help (collapsible troubleshooting).
 - **Deterministic offline mode ("Funny mode")**: canned, letter-keyed replies, no network — the app and every test run without a backend.
-- **Optional real-backend path**: typed `fetch` client (`src/api/chatApi.ts`) for `GET /api/messages`, `POST /api/chat`, `POST /api/reset`, used when Funny mode is off.
+- **A small assistant for the app itself** (`src/lib/appAssistantReply.ts`): ask it a real question ("how does reset work?", "what is funny mode?", "are you a real AI?") and it answers honestly, instead of joking — only for messages phrased as a question, so it never collides with a canned test message.
+- **AI-ready, not AI-connected**: typed `fetch` client (`src/api/chatApi.ts`) implements the full contract (`GET /api/messages`, `POST /api/chat`, `POST /api/reset`) a real LLM backend would need — used automatically when Funny mode is off, but no backend ships in this repo.
 - **Client-side history**: persisted to `localStorage`, merging server and local exchanges with de-duplication.
 - **Page Object Model E2E suite** (`e2e/`): one page-object class per screen via a `PageManager`.
 - **11-lesson Playwright course** (`lessons/`), from anatomy of a test through CI, parallelism, and best practices.
