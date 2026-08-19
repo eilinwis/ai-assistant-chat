@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchMessages, resetChat, sendChatMessage } from '../api/chatApi'
 import { useChatHistory } from '../hooks/useChatHistory'
 import { getAppAssistantReply, HELP_SUGGESTION_MESSAGE } from '../lib/appAssistantReply'
@@ -29,6 +29,19 @@ export default function ChatWindow() {
   const [error, setError] = useState<string | null>(null)
   const [historyReady, setHistoryReady] = useState(false)
   const [funnyMode, setFunnyMode] = useState(true)
+  const listRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    // Scroll to the newest content — a new message, or the "Thinking…"
+    // indicator appearing/disappearing — instead of leaving it below the
+    // fold until the user scrolls down manually. Guarded because jsdom
+    // (used by this component's own unit tests) doesn't implement
+    // Element.scrollTo.
+    const list = listRef.current
+    if (list && typeof list.scrollTo === 'function') {
+      list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' })
+    }
+  }, [messages, loading])
 
   useEffect(() => {
     let cancelled = false
@@ -146,7 +159,7 @@ export default function ChatWindow() {
           </span>
         </span>
       </label>
-      <div className="chat-window__list">
+      <div className="chat-window__list" ref={listRef}>
         {!historyReady && (
           <p className="chat-window__placeholder">Loading…</p>
         )}
