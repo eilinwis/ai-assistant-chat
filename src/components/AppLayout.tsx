@@ -26,7 +26,7 @@ export default function AppLayout() {
           className={navClass}
           data-testid="nav-tab-search"
         >
-          Search in chats
+          Search
         </NavLink>
         <NavLink
           to="/history"

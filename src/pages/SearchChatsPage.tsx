@@ -25,7 +25,7 @@ export default function SearchChatsPage() {
 
   return (
     <div className="panel">
-      <h2 className="panel__heading">Search in chats</h2>
+      <h2 className="panel__heading">Search</h2>
       <p className="panel__lede">
         Find past questions and answers stored in this browser.
       </p>

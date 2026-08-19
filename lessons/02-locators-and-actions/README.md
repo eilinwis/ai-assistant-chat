@@ -64,7 +64,7 @@ decision based on the result — this app's own client-side routing is fast
 enough that a raw read right after `page.goto`/`click` can occasionally
 catch the *previous* screen's content.
 
-## The screen for this lesson: Search in chats
+## The screen for this lesson: Search
 
 Route: `/search`, reached by clicking the `nav-tab-search` tab. It searches
 your **local chat history** (from this browser session) for text in either

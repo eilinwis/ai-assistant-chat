@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
 
-// Screen under test: Search in chats ("/search").
+// Screen under test: Search ("/search").
 // Setup happens on the Chat screen ("/") — Funny mode needs no backend.
 
 async function sendChatMessage(page: Page, text: string) {
