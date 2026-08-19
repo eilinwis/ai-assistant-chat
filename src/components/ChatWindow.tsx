@@ -32,11 +32,6 @@ export default function ChatWindow() {
   const listRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Scroll to the newest content — a new message, or the "Thinking…"
-    // indicator appearing/disappearing — instead of leaving it below the
-    // fold until the user scrolls down manually. Guarded because jsdom
-    // (used by this component's own unit tests) doesn't implement
-    // Element.scrollTo.
     const list = listRef.current
     if (list && typeof list.scrollTo === 'function') {
       list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' })
