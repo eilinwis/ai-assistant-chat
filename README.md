@@ -25,8 +25,8 @@ Aimed at engineers who know JS/TypeScript and want to learn or teach Playwright 
 - **Optional real-backend path**: typed `fetch` client (`src/api/chatApi.ts`) for `GET /api/messages`, `POST /api/chat`, `POST /api/reset`, used when Funny mode is off.
 - **Client-side history**: persisted to `localStorage`, merging server and local exchanges with de-duplication.
 - **Page Object Model E2E suite** (`e2e/`): one page-object class per screen via a `PageManager`.
-- **Four-lesson Playwright course**: getting started, locators & actions, assertions & auto-waiting, forms & input.
-- **Strict TypeScript** (`strict`, `noUnusedLocals`, `noUncheckedSideEffectImports`, …) and **GitHub Actions CI**: `ci.yml` (lint + build) and `e2e-tests.yml` (both Playwright suites, in parallel jobs), both on push/PR to `main`.
+- **11-lesson Playwright course** (`lessons/`), from anatomy of a test through CI, parallelism, and best practices.
+- **Strict TypeScript** (`strict`, `noUnusedLocals`, `noUncheckedSideEffectImports`, …) and **GitHub Actions CI**: `ci.yml` (lint + build, on push/PR to `main`) and `e2e.yml` (runs one spec file on demand, see [Testing Strategy](#testing-strategy)).
 
 ## How It Works
 
@@ -40,15 +40,12 @@ flowchart LR
     H --> P[localStorage] --> R[Search / History screens]
 ```
 
-The `lessons/` flow: read the lesson README → run `demo.spec.ts` → implement `homework.spec.ts` (remove its `test.fixme()`) → run it → `npx playwright show-report` → next lesson. `lessons/playwright.config.ts` auto-starts the dev server, so each lesson runs standalone.
-
-
 ## Testing Strategy
 
 Two independent Playwright suites:
 
 - **`e2e/` (regression, POM)** — root `playwright.config.ts`, Chromium, headed locally / headless in CI, auto-started `webServer`. `PageManager` exposes one page object per screen. Covers: chat controls render + send flow (`chat.spec.ts`), search retrieval (`search.spec.ts`), nav tabs visible (`navigation.spec.ts`), Help accordion toggling (`help.spec.ts`). Uses web-first `expect(locator)` assertions and readiness-based waits over arbitrary sleeps.
-- **`lessons/` (teaching)** — own config, same `baseURL` + auto-started `webServer` pattern. Each lesson has a working `demo.spec.ts` and a `test.fixme()`-gated `homework.spec.ts`.
+- **`lessons/` (teaching)** — own config, same `baseURL` + auto-started `webServer` pattern. Each lesson has a working `demo.spec.ts` and a `test.fixme()`-gated `homework.spec.ts`. See `lessons/README.md`.
 
 Both configs start the dev server for you — no need to run `npm run dev` in a separate terminal first.
 
@@ -59,7 +56,7 @@ npm run test:e2e
 # lessons/ course
 npm run test:lessons
 
-# either one, scoped to a single file (or run `npx playwright ...` directly for full flag access)
+# either one, scoped to a single file
 npm run test:e2e -- e2e/tests/chat.spec.ts
 npm run test:lessons -- lessons/01-getting-started
 
@@ -67,22 +64,21 @@ npm run test:lessons -- lessons/01-getting-started
 npx playwright show-report
 ```
 
-Both suites also run in CI on every push/PR to `main` — see `.github/workflows/e2e-tests.yml`.
+`ci.yml` runs lint + build on every push/PR to `main`. `e2e.yml` doesn't run
+automatically — comment `e2e <path/to/spec.ts>` on a PR and it runs just
+that file, reporting back as a check on the PR's commit.
 
 ## Getting Started
 
 ```bash
-
 npm install
 npx playwright install chromium
 
-npm run dev       
+npm run dev
 npm run lint
 npm run build
 npm run preview
 ```
-
-Tests: see [Testing Strategy](#testing-strategy) above.
 
 ## Project Structure
 
@@ -90,7 +86,7 @@ Tests: see [Testing Strategy](#testing-strategy) above.
 ai-assistant-chat/
 ├── .github/workflows/
 │   ├── ci.yml                  # lint + build on push/PR to main
-│   └── e2e-tests.yml           # e2e/ + lessons/ Playwright suites, in parallel jobs
+│   └── e2e.yml                 # runs one spec file on a PR comment: "e2e <path>"
 ├── src/
 │   ├── api/chatApi.ts         # client for the optional external backend
 │   ├── components/            # AppLayout, ChatWindow, ChatInput, ChatMessage, ...
@@ -102,7 +98,7 @@ ai-assistant-chat/
 │   └── tests/                  # chat, search, navigation, help specs
 ├── lessons/
 │   ├── playwright.config.ts    # standalone config; auto-starts the dev server
-│   └── 01-getting-started … 04-forms-and-input/
+│   └── 01-getting-started … 11-ci-parallelism-and-best-practices/
 └── playwright.config.ts        # config for e2e/
 ```
 

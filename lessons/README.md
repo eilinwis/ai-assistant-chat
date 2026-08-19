@@ -1,62 +1,50 @@
 # Playwright Testing Course
 
-A hands-on course for learning to write end-to-end tests with
+11 lessons, "what is Playwright" to CI-ready end-to-end tests, using this
+repo's own chat app as the system under test.
 
-## Prerequisites
-
-From the project root:
+## Setup
 
 ```bash
 npm install
 npx playwright install chromium
 ```
 
-You do **not** need to start the dev server yourself — `lessons/playwright.config.ts`
-starts `npm run dev` for you automatically and reuses it if it's already running.
+No need to start the dev server yourself — `lessons/playwright.config.ts`
+does it for you.
 
-Note: this app also supports talking to a real backend for non-"funny mode"
-replies and for **Reset Chat** (`POST /api/reset`). No backend is included in
-this repo, so `Reset Chat` won't visibly do anything until Lesson 9, where we
-mock that API instead of running a real server. Everything before that uses
-"Funny mode" (on by default), which needs no backend at all.
+Note: non-funny-mode replies and **Reset Chat** need a real backend, which
+this repo doesn't include — that's the point of Lesson 9 (mocking the API
+instead of running a server). Everything before that runs on "Funny mode"
+alone.
 
-## Running a lesson
+## Each lesson
 
-Each lesson has a `demo.spec.ts` (working example) and a `homework.spec.ts`
-(exercise, on the same screen as the demo). Run either one directly:
+- `README.md` — theory
+- `demo.spec.ts` — a working example, run it and experiment
+- `homework.spec.ts` — an exercise gated by `test.fixme()`; delete that line
+  once your test passes
 
 ```bash
-# run the demo for lesson 1
+# one file
 npx playwright test --config=lessons/playwright.config.ts lessons/01-getting-started/demo.spec.ts
 
-# run the homework for lesson 1
-npx playwright test --config=lessons/playwright.config.ts lessons/01-getting-started/homework.spec.ts
-
-# run every test in a lesson folder
+# a whole lesson
 npx playwright test --config=lessons/playwright.config.ts lessons/01-getting-started
 
-# run everything in the course
+# everything
 npx playwright test --config=lessons/playwright.config.ts
 ```
 
-Useful flags:
+Useful flags: `--ui`, `--debug`, `--headed`/`--headless`. Report after a
+run: `npx playwright show-report`.
 
-- `--ui` — open Playwright's UI mode (great for stepping through a test)
-- `--debug` — open the Playwright inspector and pause on the first action
-- `--headed` / `--headless` — force a browser window on or off (lessons run
-  headed by default so you can watch the browser)
+## Submitting homework
 
-After a run, open the HTML report with:
-
-```bash
-npx playwright show-report
-```
-
-## How to work through a lesson
-
-1. Read the lesson's `README.md`.
-2. Run `demo.spec.ts` and watch it execute. Open it in your editor and change
-   things — break it on purpose, then fix it — to build intuition.
-3. Open `homework.spec.ts`. It contains a task description and a
-   `test.fixme()` line. Write the test, then delete the `test.fixme()` line
-   and re-run the file to confirm it passes.
+1. Branch off `main`: `git checkout -b <your-name>/lesson-<NN>`.
+2. Solve the lesson's `homework.spec.ts` and delete its `test.fixme()`.
+3. Run it locally until it passes.
+4. Commit and push the branch.
+5. Open a PR with <[homework] lesson <NN>> .
+6. Comment on the PR: `e2e lessons/<lesson-folder>/homework.spec.ts` — CI
+   runs just that file and reports back as a check on the PR.
