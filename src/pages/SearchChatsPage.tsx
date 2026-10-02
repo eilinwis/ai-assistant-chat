@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useChatHistory } from '../hooks/useChatHistory'
 import { dateKeyFromIso } from '../lib/chatHistoryStorage'
+import { useHardMode } from '../hardMode/useHardMode'
 
 function formatDayLabel(dateKey: string): string {
   if (dateKey === 'invalid') return 'Unknown date'
@@ -11,17 +12,25 @@ function formatDayLabel(dateKey: string): string {
 
 export default function SearchChatsPage() {
   const { exchanges } = useChatHistory()
+  const { isOn, rand } = useHardMode()
+  const shuffle = isOn('unstable-dom')
   const [query, setQuery] = useState('')
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return []
-    return exchanges.filter(
+    const matches = exchanges.filter(
       (e) =>
         e.userContent.toLowerCase().includes(q) ||
         e.assistantContent.toLowerCase().includes(q),
     )
-  }, [exchanges, query])
+    if (!shuffle) return matches
+    // unstable-dom: a different (but seed-stable) order for every query.
+    return matches
+      .map((e) => ({ e, k: rand('search-order', q, e.id) }))
+      .sort((a, b) => a.k - b.k)
+      .map(({ e }) => e)
+  }, [exchanges, query, shuffle, rand])
 
   return (
     <div className="panel">

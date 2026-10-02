@@ -1,10 +1,12 @@
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useTid } from '../hardMode/useHardMode'
 
 const navClass = ({ isActive }: { isActive: boolean }) =>
   `app-nav__link${isActive ? ' app-nav__link--active' : ''}`
 
 export default function AppLayout() {
   const navigate = useNavigate()
+  const tid = useTid()
   const location = useLocation()
   const isWide = location.pathname === '/playground'
   return (
@@ -25,32 +27,32 @@ export default function AppLayout() {
           to="/"
           end
           className={navClass}
-          data-testid="nav-tab-chat"
+          {...tid('nav-tab-chat')}
         >
           Chat
         </NavLink>
         <NavLink
           to="/search"
           className={navClass}
-          data-testid="nav-tab-search"
+          {...tid('nav-tab-search')}
         >
           Search
         </NavLink>
         <NavLink
           to="/history"
           className={navClass}
-          data-testid="nav-tab-history"
+          {...tid('nav-tab-history')}
         >
           Message history
         </NavLink>
         <NavLink
           to="/playground"
           className={navClass}
-          data-testid="nav-tab-playground"
+          {...tid('nav-tab-playground')}
         >
           Playground
         </NavLink>
-        <NavLink to="/help" className={navClass} data-testid="nav-tab-help">
+        <NavLink to="/help" className={navClass} {...tid('nav-tab-help')}>
           Help
         </NavLink>
       </nav>

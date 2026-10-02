@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTid } from '../hardMode/useHardMode'
 
 const THEMES = [
   { id: 'aurora', label: 'Aurora', hint: 'Aurora theme — blue glass' },
@@ -25,6 +26,7 @@ function readStoredTheme(): ThemeId {
 
 export default function ThemeSwitcher() {
   const [theme, setTheme] = useState<ThemeId>(readStoredTheme)
+  const tid = useTid()
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -44,7 +46,7 @@ export default function ThemeSwitcher() {
           className={`theme-switch__dot theme-switch__dot--${option.id}${
             theme === option.id ? ' theme-switch__dot--active' : ''
           }`}
-          data-testid={`theme-${option.id}`}
+          {...tid(`theme-${option.id}`)}
           aria-pressed={theme === option.id}
           title={option.hint}
           onClick={() => setTheme(option.id)}
