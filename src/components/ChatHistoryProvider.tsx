@@ -1,6 +1,8 @@
 import {
   useCallback,
+  useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -13,14 +15,36 @@ import {
   loadExchanges,
   upsertExchanges,
 } from '../lib/chatHistoryStorage'
+import { useHardMode } from '../hardMode/useHardMode'
+
+const SYNC_CHANNEL = 'chat-lab:history'
 
 export function ChatHistoryProvider({ children }: { children: ReactNode }) {
   const [exchanges, setExchanges] = useState<ChatExchange[]>(() =>
     loadExchanges(),
   )
+  const { isOn } = useHardMode()
+  const syncTabs = isOn('multi-tab')
+  const channelRef = useRef<BroadcastChannel | null>(null)
 
   const refresh = useCallback(() => {
     setExchanges(loadExchanges())
+  }, [])
+
+  // multi-tab: other tabs of this origin re-read storage when this one writes.
+  useEffect(() => {
+    if (!syncTabs || typeof BroadcastChannel === 'undefined') return
+    const channel = new BroadcastChannel(SYNC_CHANNEL)
+    channel.onmessage = () => setExchanges(loadExchanges())
+    channelRef.current = channel
+    return () => {
+      channel.close()
+      channelRef.current = null
+    }
+  }, [syncTabs])
+
+  const notifyTabs = useCallback(() => {
+    channelRef.current?.postMessage('changed')
   }, [])
 
   const recordSuccessfulExchange = useCallback(
@@ -37,8 +61,9 @@ export function ChatHistoryProvider({ children }: { children: ReactNode }) {
       }
       upsertExchanges([ex])
       refresh()
+      notifyTabs()
     },
-    [refresh],
+    [refresh, notifyTabs],
   )
 
   const mergeServerMessages = useCallback(
@@ -53,7 +78,8 @@ export function ChatHistoryProvider({ children }: { children: ReactNode }) {
   const clearAllHistory = useCallback(() => {
     clearStoredExchanges()
     setExchanges([])
-  }, [])
+    notifyTabs()
+  }, [notifyTabs])
 
   const value = useMemo(
     () => ({
