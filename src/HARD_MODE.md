@@ -39,7 +39,7 @@ the order in which features ask for numbers.
 | `unstable-dom` | The History list re-mounts every 3 s. Search results come back shuffled (stable per seed and query). | Locators vs element handles; `filter({ hasText })` vs `.nth()` |
 | `no-testids` | All `data-testid` attributes are removed (except on the hard mode controls). | Role, label and text locators |
 | `moving-target` | The Send button slides in when enabled; a "press Enter" tip covers it until dismissed. | Actionability checks, "element intercepts pointer events" |
-| `iframe-widget` | A support form inside an iframe, with its own "rate us" modal. The ticket number is seed-determined. | `frameLocator()` |
+| `iframe-widget` | Three large forms, each inside its own iframe with its own "rate us" modal: support (bottom right), "What's your question?" (bottom left) and an email-for-10%-discount form (bottom centre). Each has a close button on the page (outside the iframe) that appears after 0 s, 2 s and 4 s respectively. Ticket numbers are seed-determined. | `frameLocator()` |
 | `shadow-dom` | A `<feedback-widget>` custom element with its UI in an open shadow root. | Locators piercing shadow DOM (XPath does not) |
 | `files` | Attach a file to a message; export history as `chat-history.json`. | `setInputFiles()`, `waitForEvent('download')` |
 | `multi-tab` | "Open history in new window" button; history syncs live between tabs via `BroadcastChannel`. | `context.waitForEvent('page')`, multi-page tests |
@@ -86,7 +86,7 @@ the order in which features ask for numbers.
 | `hardMode/withHardMode.ts` | Wraps the reply source with latency, flaky network and rate limit |
 | `hardMode/HardModeToggle.tsx` | Toggle, seed badge and flag panel |
 | `hardMode/overlays/` | Cookie banner, promo modal, toasts |
-| `hardMode/widgets/` | Support iframe, shadow-DOM feedback widget |
+| `hardMode/widgets/` | Support/question/discount iframes, shadow-DOM feedback widget |
 | `hardMode/promoSchedule.ts` | Promo modal delays: seeded first delay, doubling after each close, capped at 20 s |
 | `hardMode/relativeTime.ts` | "N minutes ago" and day labels |
 | `lib/replyService.ts` | The plain (non-hard-mode) reply logic, extracted from `ChatWindow` |

@@ -9,7 +9,13 @@ export default function OverlayRoot() {
 
   return (
     <>
-      {isOn('iframe-widget') && <SupportWidget />}
+      {isOn('iframe-widget') && (
+        <>
+          <SupportWidget />
+          <SupportWidget variant="question" />
+          <SupportWidget variant="discount" />
+        </>
+      )}
       {isOn('popups') && (
         <>
           <CookieBanner />

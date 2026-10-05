@@ -1720,12 +1720,56 @@ body::before {
   right: 1rem;
   bottom: 1rem;
   z-index: 30;
-  width: 17rem;
-  height: 13rem;
+  width: min(28rem, calc(100vw - 2rem));
+  height: min(19rem, calc(100vh - 2rem));
   border: 1px solid var(--panel-border);
   border-radius: var(--radius-lg);
+  overflow: hidden;
   background: #11131d;
   box-shadow: 0 20px 50px -25px rgb(0 0 0 / 95%);
+}
+
+.hm-support__frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.hm-support__close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--panel-border);
+  border-radius: 50%;
+  background: #262a3d;
+  color: var(--text);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.hm-support__close:hover {
+  background: #343850;
+}
+
+/* Sits on top of the nav tabs (Search … Help), leaving only "Chat" clear. */
+.hm-support--question {
+  top: 6.5rem;
+  right: auto;
+  bottom: auto;
+  left: max(1rem, calc(50% - 18rem));
+}
+
+.hm-support--discount {
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .hm-feedback {
