@@ -1,0 +1,97 @@
+name: flake-score
+
+# Comment on a PR: "flake-score" scores the hard mode suite (e2e/hard-mode/),
+# "flake-score <path>" scores that path instead — all 10 seeds × 2 runs, see
+# src/HARD_MODE.md, "Flake Score". Only tests that turn hard mode on
+# themselves are scored. Anything not matching that exact shape runs nothing.
+#
+# Two workflows on purpose. This one runs the PR's code, so it gets a
+# read-only token, no secrets and no shared npm cache. Posting the result
+# needs write access, so flake-score-comment.yml does that from the uploaded
+# artifact, without ever checking out or running the PR's code.
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flake-score-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  score:
+    # Only the PR's author (homework flow) and people with write access may
+    # make the runner execute a PR's code.
+    if: >-
+      github.event.issue.pull_request != null &&
+      startsWith(github.event.comment.body, 'flake-score') &&
+      (github.event.comment.user.login == github.event.issue.user.login ||
+       contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association))
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Parse comment for "flake-score [path]"
+        id: parse
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        run: |
+          TRIMMED="$(printf '%s' "$COMMENT_BODY" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+          if [[ "$TRIMMED" =~ ^flake-score([[:space:]]+([A-Za-z0-9._/-]+))?$ ]]; then
+            echo "path=${BASH_REMATCH[2]:-e2e/hard-mode/}" >> "$GITHUB_OUTPUT"
+          else
+            echo "path=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout PR head
+        if: steps.parse.outputs.path != ''
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
+          persist-credentials: false
+
+      # No `cache: npm` — a cache written from a PR's code could be restored
+      # into the trusted workflows.
+      - name: Set up Node.js
+        if: steps.parse.outputs.path != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        if: steps.parse.outputs.path != ''
+        run: npm ci
+
+      - name: Install Playwright browsers
+        if: steps.parse.outputs.path != ''
+        run: npx playwright install --with-deps chromium
+
+      - name: Score ${{ steps.parse.outputs.path }}
+        if: steps.parse.outputs.path != ''
+        env:
+          SCORE_PATH: ${{ steps.parse.outputs.path }}
+        run: npm run flake-score -- "$SCORE_PATH" --repeats=2
+
+      - name: Make sure there is a report to post
+        if: ${{ always() && steps.parse.outputs.path != '' }}
+        run: |
+          mkdir -p flake-score-report
+          if [ ! -f flake-score-report/flake-score.md ]; then
+            echo "### Flake Score: the run failed before producing a score — see the workflow log." > flake-score-report/flake-score.md
+          fi
+
+      # The PR number travels in the artifact's name, which this file sets
+      # from the event — not in a file, which the PR's code could rewrite.
+      - name: Upload report
+        if: ${{ always() && steps.parse.outputs.path != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: flake-score-pr-${{ github.event.issue.number }}
+          path: |
+            flake-score-report/flake-score.md
+            flake-score-report/flake-score.json
+            flake-score-report/flake-score-badge.json
+            flake-score-report/test-results/
+          retention-days: 7

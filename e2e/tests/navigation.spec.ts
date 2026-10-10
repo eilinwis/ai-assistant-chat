@@ -1,4 +1,4 @@
-import { test } from '../hard-mode/test'
+import { test } from '@playwright/test'
 import { PageManager } from '../pages/pageManager'
 
 test.beforeEach(async ({ page }) => {

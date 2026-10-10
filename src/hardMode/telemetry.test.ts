@@ -33,7 +33,7 @@ describe('formatEvent / parseEvent', () => {
   })
 
   it('ignores other console output and malformed lines', () => {
-    expect(parseEvent('[hard mode] seed=42 flags=latency')).toBeNull()
+    expect(parseEvent('[hard mode] seed=4 flags=latency')).toBeNull()
     expect(parseEvent('[hard mode] event nodata')).toBeNull()
     expect(parseEvent('[hard mode] event x {broken')).toBeNull()
     expect(parseEvent('[hard mode] event x [1,2]')).toBeNull()
@@ -47,8 +47,8 @@ describe('formatMarker', () => {
   })
 
   it('sorts flags so equal configs read the same', () => {
-    expect(formatMarker({ enabled: true, seed: 42, flags: ['toasts', 'latency'] })).toBe(
-      'seed=42;flags=latency,toasts',
+    expect(formatMarker({ enabled: true, seed: 4, flags: ['toasts', 'latency'] })).toBe(
+      'seed=4;flags=latency,toasts',
     )
   })
 })

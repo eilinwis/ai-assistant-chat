@@ -43,7 +43,7 @@ export function parseEvent(line: string): HardModeEvent | null {
 }
 
 /**
- * The `data-hard-mode` value on <html>: `seed=42;flags=latency,toasts`, or
+ * The `data-hard-mode` value on <html>: `seed=4;flags=latency,toasts`, or
  * `off`. Flags are sorted so two equal configs always read the same.
  */
 export function formatMarker(config: HardModeConfig): string {

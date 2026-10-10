@@ -22,5 +22,14 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["../vite.config.ts", "./vitest.config.ts"]
+  "include": [
+    "../vite.config.ts",
+    "./vitest.config.ts",
+    "./flake-score.config.ts",
+    "./flakeScore.ts",
+    "./flakeScore.test.ts",
+    "./flakeScoreReporter.ts",
+    "../scripts/**/*.ts",
+    "../e2e/hard-mode/storage.ts"
+  ]
 }
