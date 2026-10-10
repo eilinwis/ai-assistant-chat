@@ -1,5 +1,3 @@
-![](src/assets/logo.png)
-
 # Playwright Chat Lab
 
 **The Playwright practice app that fights back.**
