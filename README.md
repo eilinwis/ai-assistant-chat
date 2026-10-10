@@ -13,11 +13,11 @@ Real-world UI chaos on demand — reproducible by seed, scored by Flake Score.
 
 
 
-> Chat Lab is a real app that turns chaotic when you ask it to:
->
-> - **Real-world  behaviour, combinable** - cookie walls, flaky network, iframes - 15 flags, on one at a time or all at once.
-> - **Reproducible by seed** — ten different combinations of challenges from real world applications.
-> - **Flake Score** — runs your hard mode tests across all 10 seeds and tells how sustainable your tests are.
+Chat Lab is a real app that turns chaotic when you ask it to:
+
+- **Real-world  behaviour, combinable** - cookie walls, flaky network, iframes - 15 flags, on one at a time or all at once.
+- **Reproducible by seed** — ten different combinations of challenges from real world applications.
+- **Flake Score** — runs your hard mode tests across all 10 seeds and tells how sustainable your tests are.
 
 ![Turning on Hard Mode: iframe widgets, a tip over the Send button and a promo modal take over the chat](src/assets/hard_mode_demo.gif)
 
