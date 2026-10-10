@@ -8,6 +8,7 @@ import {
 } from './hardModeConfig'
 import { HardModeContext, type Toast } from './hardModeContext'
 import { rand as keyedRand } from './rng'
+import { emitEvent, publishConfig } from './telemetry'
 import { createRuntime } from './withHardMode'
 
 const TOAST_MS = 1500
@@ -42,6 +43,10 @@ export function HardModeProvider({ children }: { children: ReactNode }) {
         `[hard mode] seed=${config.seed} flags=${config.flags.join(',')}`,
       )
     }
+    // On every page load and every change, enabled or not — a test fixture
+    // compares this against the config it expected (e2e/hard-mode/test.ts).
+    publishConfig(config)
+    emitEvent('config', { enabled: config.enabled, seed: config.seed, flags: config.flags })
   }, [config])
 
   const isOn = useCallback(
@@ -59,6 +64,7 @@ export function HardModeProvider({ children }: { children: ReactNode }) {
     (text: string) => {
       if (!toastsOn) return
       const id = nextToastId.current++
+      emitEvent('toasts:shown', { text })
       setToasts((prev) => [...prev, { id, text }])
       setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== id))
@@ -76,6 +82,7 @@ export function HardModeProvider({ children }: { children: ReactNode }) {
       runtime,
       toasts,
       toast,
+      emit: emitEvent,
     }),
     [config, isOn, rand, runtime, toasts, toast],
   )

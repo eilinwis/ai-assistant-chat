@@ -10,6 +10,7 @@
     "test": "vitest run --config config/vitest.config.ts",
     "test:e2e": "playwright test",
     "test:lessons": "playwright test --config=lessons/playwright.config.ts",
+    "flake-score": "node --disable-warning=ExperimentalWarning scripts/flake-score.ts",
     "preview": "vite preview"
   },
   "dependencies": {

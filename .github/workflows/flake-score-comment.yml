@@ -1,0 +1,51 @@
+name: flake-score-comment
+
+# Posts the report of a finished flake-score run as a PR comment. Runs in
+# this repository's trusted context and never checks out or executes the
+# PR's code: it only reads the uploaded artifact and posts its report as
+# untrusted text. The PR number comes from the artifact's name, which the
+# trusted workflow file sets — never from the artifact's contents.
+
+on:
+  workflow_run:
+    workflows: [flake-score]
+    types: [completed]
+
+permissions:
+  actions: read
+  pull-requests: write
+
+jobs:
+  comment:
+    if: >-
+      github.event.workflow_run.event == 'issue_comment' &&
+      (github.event.workflow_run.conclusion == 'success' ||
+       github.event.workflow_run.conclusion == 'failure')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download report
+        id: download
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          pattern: flake-score-pr-*
+          path: report
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Comment on the PR
+        if: steps.download.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+        run: |
+          # With `pattern`, each artifact lands in report/<artifact name>/.
+          DIR="$(find report -mindepth 1 -maxdepth 1 -type d -name 'flake-score-pr-*' | head -n 1)"
+          PR="${DIR##*flake-score-pr-}"
+          if ! [[ "$PR" =~ ^[0-9]+$ ]]; then
+            echo "No flake-score-pr-<number> artifact: nothing to comment." >&2
+            exit 1
+          fi
+          # GitHub caps a comment at 65536 characters.
+          { head -c 60000 "$DIR/flake-score.md"; printf '\n\n[Workflow run](%s)\n' "$RUN_URL"; } > body.md
+          gh pr comment "$PR" --repo "${{ github.repository }}" --body-file body.md

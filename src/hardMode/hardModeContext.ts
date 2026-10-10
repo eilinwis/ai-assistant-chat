@@ -1,5 +1,6 @@
 import { createContext } from 'react'
 import { HARD_MODE_OFF, type HardModeConfig, type HardModeFlag } from './hardModeConfig'
+import type { Emit } from './telemetry'
 import { createRuntime, type HardModeRuntime } from './withHardMode'
 
 export interface Toast {
@@ -17,6 +18,8 @@ export interface HardModeContextValue {
   toasts: Toast[]
   /** No-op unless the `toasts` flag is on. */
   toast: (text: string) => void
+  /** Reports a hard-mode event as a console line — see telemetry.ts. */
+  emit: Emit
 }
 
 // Outside a provider (unit tests render ChatWindow bare) everything is off.
@@ -28,4 +31,5 @@ export const HardModeContext = createContext<HardModeContextValue>({
   runtime: createRuntime(),
   toasts: [],
   toast: () => undefined,
+  emit: () => undefined,
 })

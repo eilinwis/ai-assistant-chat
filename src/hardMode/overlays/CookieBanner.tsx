@@ -1,27 +1,22 @@
-import { useState } from 'react'
-import { useTid } from '../useHardMode'
+import { useEffect, useState } from 'react'
+import { DISMISSAL_KEYS, readDismissal, writeDismissal } from '../dismissal'
+import { useHardMode, useTid } from '../useHardMode'
 
-/** In localStorage on purpose: a test can skip the banner via storageState. */
-const CONSENT_KEY = 'chat-lab:hard-mode:consent'
-
-function hasDecided(): boolean {
-  try {
-    return localStorage.getItem(CONSENT_KEY) !== null
-  } catch {
-    return false
-  }
-}
-
+// In localStorage on purpose: a test can skip the banner via storageState.
 export default function CookieBanner() {
   const tid = useTid()
-  const [open, setOpen] = useState(() => !hasDecided())
+  const { emit } = useHardMode()
+  const [open, setOpen] = useState(() => readDismissal(DISMISSAL_KEYS.consent) === null)
+
+  // Fires once per page load at most: the banner only ever goes from open to
+  // closed, never back.
+  useEffect(() => {
+    if (open) emit('popups:cookie-shown')
+  }, [open, emit])
 
   function decide(choice: 'accepted' | 'rejected') {
-    try {
-      localStorage.setItem(CONSENT_KEY, choice)
-    } catch {
-      void 0
-    }
+    writeDismissal(DISMISSAL_KEYS.consent, choice)
+    emit('popups:cookie-decided', { choice })
     setOpen(false)
   }
 

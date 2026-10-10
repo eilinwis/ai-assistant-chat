@@ -1,5 +1,11 @@
 import { useState } from 'react'
-import { ALL_FLAGS, HARD_MODE_FLAGS, parseSeed, type HardModeFlag } from './hardModeConfig'
+import {
+  ALL_FLAGS,
+  HARD_MODE_FLAGS,
+  HARD_MODE_SETS,
+  parseSeed,
+  type HardModeFlag,
+} from './hardModeConfig'
 import { useHardMode } from './useHardMode'
 
 // The controls keep their test ids even under `no-testids` — a test has to be
@@ -23,6 +29,13 @@ export default function HardModeToggle() {
       ? ALL_FLAGS.filter((f) => f === flag || config.flags.includes(f))
       : config.flags.filter((f) => f !== flag)
     setConfig({ ...config, flags, enabled: config.enabled && flags.length > 0 })
+  }
+
+  function urlFlags(): string {
+    if (config.flags.length === ALL_FLAGS.length) return 'all'
+    const same = (flags: readonly string[]) =>
+      flags.length === config.flags.length && flags.every((f) => config.flags.includes(f as HardModeFlag))
+    return HARD_MODE_SETS.find((set) => same(set.flags))?.id ?? (config.flags.join(',') || 'off')
   }
 
   function applySeed() {
@@ -64,10 +77,11 @@ export default function HardModeToggle() {
         <div className="hm-panel" data-testid="hard-mode-panel">
           <div className="hm-panel__row">
             <label className="hm-panel__seed">
-              Seed
+              Seed (1–10)
               <input
                 type="text"
                 inputMode="numeric"
+                maxLength={2}
                 value={seedDraft}
                 onChange={(e) => setSeedDraft(e.target.value)}
                 onBlur={applySeed}
@@ -93,6 +107,18 @@ export default function HardModeToggle() {
               None
             </button>
           </div>
+          <div className="hm-panel__row" role="group" aria-label="Flag sets">
+            {HARD_MODE_SETS.map((set) => (
+              <button
+                key={set.id}
+                type="button"
+                className="hm-panel__bulk"
+                onClick={() => setConfig({ ...config, flags: [...set.flags], enabled: true })}
+              >
+                {set.label}
+              </button>
+            ))}
+          </div>
           <ul className="hm-panel__flags">
             {HARD_MODE_FLAGS.map((flag) => (
               <li key={flag.id}>
@@ -111,7 +137,7 @@ export default function HardModeToggle() {
             ))}
           </ul>
           <p className="hm-panel__url">
-            URL: <code>?hard={config.flags.length === ALL_FLAGS.length ? 'all' : config.flags.join(',') || 'off'}&amp;seed={config.seed}</code>
+            URL: <code>?hard={urlFlags()}&amp;seed={config.seed}</code>
           </p>
         </div>
       )}

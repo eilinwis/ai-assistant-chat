@@ -52,6 +52,31 @@ export type HardModeFlag = (typeof HARD_MODE_FLAGS)[number]['id']
 
 export const ALL_FLAGS: readonly HardModeFlag[] = HARD_MODE_FLAGS.map((f) => f.id)
 
+/**
+ * Themed flag sets, usable wherever a flag is (`?hard=bad-network&seed=4`).
+ * A set's contents never change once published — tests written against it
+ * must keep meaning the same thing. A new flag goes into a new set; `all`
+ * is the only name whose contents grow.
+ */
+export const HARD_MODE_SETS = [
+  {
+    id: 'bad-network',
+    label: 'Bad network',
+    flags: ['latency', 'flaky-network', 'rate-limit', 'slow-history', 'toasts'],
+  },
+  {
+    id: 'tricky-dom',
+    label: 'Tricky DOM',
+    flags: ['unstable-dom', 'no-testids', 'moving-target', 'iframe-widget', 'shadow-dom'],
+  },
+] as const satisfies readonly { id: string; label: string; flags: readonly HardModeFlag[] }[]
+
+export type HardModeSet = (typeof HARD_MODE_SETS)[number]['id']
+
+export function findSet(name: string): (typeof HARD_MODE_SETS)[number] | undefined {
+  return HARD_MODE_SETS.find((set) => set.id === name)
+}
+
 export interface HardModeConfig {
   enabled: boolean
   /** Kept while disabled too, so switching back on restores the selection. */
@@ -59,7 +84,18 @@ export interface HardModeConfig {
   seed: number
 }
 
-export const HARD_MODE_OFF: HardModeConfig = { enabled: false, flags: [], seed: 0 }
+/**
+ * Seeds are 1–10: ten scenarios per flag set, few enough that Flake Score
+ * runs every one of them and a failing seed is easy to name and replay.
+ */
+export const SEED_MIN = 1
+export const SEED_MAX = 10
+export const ALL_SEEDS: readonly number[] = Array.from(
+  { length: SEED_MAX - SEED_MIN + 1 },
+  (_, i) => SEED_MIN + i,
+)
+
+export const HARD_MODE_OFF: HardModeConfig = { enabled: false, flags: [], seed: SEED_MIN }
 
 export const STORAGE_KEY = 'chat-lab:hard-mode'
 
@@ -70,20 +106,41 @@ function isFlag(value: string): value is HardModeFlag {
   return (ALL_FLAGS as readonly string[]).includes(value)
 }
 
-/** `all`/`1`/`on` → every flag; otherwise a comma list, unknown names dropped. */
+/**
+ * `all`/`1`/`on` → every flag; otherwise a comma list of flags and set names
+ * (sets expand to their flags), unknown names dropped.
+ */
 export function parseFlags(raw: string): HardModeFlag[] {
   const value = raw.trim().toLowerCase()
   if (ALL_VALUES.has(value)) return [...ALL_FLAGS]
   const flags = value
     .split(',')
     .map((s) => s.trim())
+    .flatMap((name): readonly string[] => findSet(name)?.flags ?? [name])
     .filter(isFlag)
   return [...new Set(flags)]
 }
 
+export function isSeed(value: number): boolean {
+  return Number.isInteger(value) && value >= SEED_MIN && value <= SEED_MAX
+}
+
+/** A seed typed in by hand (the ⚙ panel): 1–10 exactly, anything else → null. */
 export function parseSeed(raw: string | null): number | null {
+  if (raw === null || !/^\d{1,2}$/.test(raw.trim())) return null
+  const seed = Number(raw.trim())
+  return isSeed(seed) ? seed : null
+}
+
+/**
+ * A seed from a URL or from storage. Seeds used to go up to 999 999 999, and
+ * old links and saved configs still carry them: fold those into 1–10 (42 → 2,
+ * 0 → 10) rather than drop them, so they keep working, if as another scenario.
+ */
+export function coerceSeed(raw: string | null): number | null {
   if (raw === null || !/^\d{1,9}$/.test(raw.trim())) return null
-  return Number(raw.trim())
+  const seed = Number(raw.trim())
+  return isSeed(seed) ? seed : seed % SEED_MAX || SEED_MAX
 }
 
 export function parseStored(raw: string | null): HardModeConfig | null {
@@ -91,7 +148,7 @@ export function parseStored(raw: string | null): HardModeConfig | null {
   try {
     const data = JSON.parse(raw) as Partial<HardModeConfig>
     if (typeof data !== 'object' || data === null) return null
-    const seed = parseSeed(String(data.seed ?? ''))
+    const seed = coerceSeed(String(data.seed ?? ''))
     if (seed === null) return null
     const flags = Array.isArray(data.flags)
       ? data.flags.filter((f): f is HardModeFlag => typeof f === 'string' && isFlag(f))
@@ -114,7 +171,7 @@ export function resolveConfig(
 ): HardModeConfig {
   const params = new URLSearchParams(search)
   const hard = params.get('hard')
-  const urlSeed = parseSeed(params.get('seed'))
+  const urlSeed = coerceSeed(params.get('seed'))
   const base = parseStored(stored)
 
   if (hard !== null) {
@@ -133,5 +190,5 @@ export function resolveConfig(
 }
 
 export function randomSeed(): number {
-  return Math.floor(Math.random() * 100_000)
+  return SEED_MIN + Math.floor(Math.random() * ALL_SEEDS.length)
 }
