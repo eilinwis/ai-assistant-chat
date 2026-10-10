@@ -76,6 +76,56 @@ the order in which features ask for numbers.
 - Pin a seed in the URL while debugging; drop it (or try several) to check
   that a test doesn't depend on one lucky sequence.
 
+## Events, marker and the test fixture
+
+Hard mode reports what it does, so a failing run can be explained and a test
+runner can check what it actually ran with.
+
+- **Marker:** `<html data-hard-mode="seed=42;flags=latency,toasts">` (flags
+  sorted), or `data-hard-mode="off"`.
+- **Events:** each one is a console line, logged with `console.debug` (hidden
+  in DevTools by default, still delivered to `page.on('console')`):
+
+  ```
+  [hard mode] event popups:promo-shown {"iteration":0,"afterMs":3120}
+  ```
+
+  `config` is emitted on every page load and every change, enabled or not.
+  The others: `latency`, `flaky-network:failed`, `rate-limit:hit`,
+  `toasts:shown`, `popups:cookie-shown`, `popups:cookie-decided`,
+  `popups:promo-shown`, `popups:promo-closed`. The last 200 are also kept in
+  `window.__hardMode.events` for poking at by hand (reset on every load).
+- **Fixture (optional):** import `test` and `expect` from
+  `e2e/hard-mode/test.ts` instead of `@playwright/test`. Every test then
+  collects the event journal from all pages of its context
+  (`hardModeJournal`) and attaches it to the report when it fails. With the
+  `hardMode` option set, the fixture also checks every page load against it:
+  a test that ends up with other flags (say, it opened `/?hard=off`) gets a
+  `hard-mode-mismatch` annotation instead of passing silently.
+
+  ```ts
+  import { hardModeStorageState, test } from '../hard-mode/test'
+
+  const run = { seed: 42, flags: ['popups', 'latency'] }
+  test.use({
+    hardMode: run, // what to check against
+    storageState: hardModeStorageState('http://localhost:5173', run), // how to turn it on
+  })
+  ```
+
+  The fixture never turns hard mode on by itself — `storageState` does, and
+  works the same for tests that don't import the fixture.
+
+## Storage keys
+
+Set these before the page loads (`storageState` or `addInitScript`) to skip
+an overlay. They're public: never renamed, see `hardMode/dismissal.ts`.
+
+| Key | Storage | Values | Effect |
+|---|---|---|---|
+| `chat-lab:hard-mode` | `localStorage` | `{"enabled":true,"flags":[...],"seed":42}` | The hard mode config itself |
+| `chat-lab:hard-mode:consent` | `localStorage` | `accepted` / `rejected` | Cookie banner doesn't show |
+
 ## Code layout
 
 | Path | Purpose |
@@ -89,6 +139,9 @@ the order in which features ask for numbers.
 | `hardMode/widgets/` | Support/question/discount iframes, shadow-DOM feedback widget |
 | `hardMode/promoSchedule.ts` | Promo modal delays: seeded first delay, doubling after each close, capped at 20 s |
 | `hardMode/relativeTime.ts` | "N minutes ago" and day labels |
+| `hardMode/telemetry.ts` | Event lines, the `data-hard-mode` marker, `window.__hardMode` — shared with the e2e fixture |
+| `hardMode/dismissal.ts` | "Shown once" storage keys for overlays |
+| `../e2e/hard-mode/test.ts` | Optional Playwright fixture: event journal, config check, `hardModeStorageState()` |
 | `lib/replyService.ts` | The plain (non-hard-mode) reply logic, extracted from `ChatWindow` |
 
 Network-shaped chaos lives in the `withHardMode()` wrapper, not in

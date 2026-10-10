@@ -3,6 +3,7 @@ import type { GetReply } from '../lib/replyService'
 import type { Message } from '../types/Message'
 import type { HardModeFlag } from './hardModeConfig'
 import { rand } from './rng'
+import type { Emit } from './telemetry'
 import {
   createRuntime,
   FlakyNetworkError,
@@ -17,6 +18,7 @@ const reply: Message = { id: 'a', role: 'assistant', content: 'hi', timestamp: '
 function setup(flags: HardModeFlag[], seed = 42) {
   const inner = vi.fn<GetReply>().mockResolvedValue(reply)
   const sleep = vi.fn<(ms: number) => Promise<void>>().mockResolvedValue()
+  const emit = vi.fn<Emit>()
   let clock = 0
   const wrapped = withHardMode(inner, {
     isOn: (f) => flags.includes(f),
@@ -24,8 +26,9 @@ function setup(flags: HardModeFlag[], seed = 42) {
     runtime: createRuntime(),
     now: () => clock,
     sleep,
+    emit,
   })
-  return { inner, sleep, wrapped, tick: (ms: number) => (clock += ms) }
+  return { inner, sleep, emit, wrapped, tick: (ms: number) => (clock += ms) }
 }
 
 async function outcomes(wrapped: GetReply, n: number): Promise<string[]> {
@@ -92,5 +95,25 @@ describe('withHardMode', () => {
 
     tick((err as RateLimitError).retryAfterMs)
     await expect(wrapped('x', 'funny')).resolves.toBe(reply)
+  })
+
+  it('emits an event for every delay, failure and rate-limit hit', async () => {
+    // No clock ticks, so the send after RATE_LIMIT.max lands inside the window.
+    const { emit, sleep, wrapped } = setup(['latency', 'flaky-network', 'rate-limit'], 3)
+    const results = await outcomes(wrapped, RATE_LIMIT.max + 1)
+
+    const types = emit.mock.calls.map(([type]) => type)
+    expect(types.filter((t) => t === 'latency')).toHaveLength(sleep.mock.calls.length)
+    expect(types.filter((t) => t === 'flaky-network:failed')).toHaveLength(
+      results.filter((r) => r === 'FlakyNetworkError').length,
+    )
+    expect(types).toContain('rate-limit:hit')
+    expect(emit).toHaveBeenCalledWith('latency', { attempt: 0, ms: sleep.mock.calls[0][0] })
+  })
+
+  it('is silent with no flags on', async () => {
+    const { emit, wrapped } = setup([])
+    await outcomes(wrapped, 3)
+    expect(emit).not.toHaveBeenCalled()
   })
 })
