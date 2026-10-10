@@ -1,4 +1,10 @@
-# Playwright Chat Lab 💬
+![](src/assets/logo.png)
+
+# Playwright Chat Lab
+
+**The Playwright practice app that fights back.**
+
+Real-world UI chaos on demand — reproducible by seed, scored by Flake Score.
 
 ![CI](https://github.com/eilinwis/playwright-chat-lab/actions/workflows/ci.yml/badge.svg)
 ![e2e](https://github.com/eilinwis/playwright-chat-lab/actions/workflows/e2e.yml/badge.svg)
@@ -7,67 +13,102 @@
 ![GitHub Repo forks](https://img.shields.io/github/forks/eilinwis/playwright-chat-lab?style=flat-square&color=ffa500)
 ![GitHub Repo commits](https://badgen.net/github/commits/eilinwis/playwright-chat-lab/main?color=purple)
 
-A React/TypeScript chat application built for practicing Playwright e2e testing on your own or within 11-lessons course.
-
-<div align="center" style="text-align: center">
-    <img src="src/assets/readme_image.png" alt="Playwright Chat Lab chat screen" width="628" />
-</div>
-
-## Overview
-Two things, developed together:
-
-1. **A small chat web app** (`src/`) — client-side routing, local persistence, and a testable UI.
-2. **A Playwright course** (`lessons/`) — lessons that use the app above as the system under test, each pairing an explanation with a working demo and a homework exercise.
-
-Aimed at experienced engineers who know JS/TypeScript and want to learn or teach Playwright against a realistic small app.
-
-## Key Features
-
-- **Five-screen chat app**: Chat, Search, Message history, Playground, Help.
-- **Deterministic offline mode ("Funny mode")**: canned, letter-keyed replies, no network — the app and every test run without a backend.
-- **A small assistant for the app itself** (`src/lib/appAssistantReply.ts`): ask it a real question ("how does reset work?", "what is funny mode?", "are you a real AI?") and it answers honestly, instead of joking — only for messages phrased as a question, so it never collides with a canned test message.
-- **Client-side history**: persisted to `localStorage`, merging server and local exchanges with de-duplication.
-- **11-lesson Playwright course** (`lessons/`), from anatomy of a test through CI, parallelism, and best practices.
-- **Strict TypeScript** (`strict`, `noUnusedLocals`, `noUncheckedSideEffectImports`, …) and **GitHub Actions CI**: `ci.yml` (lint + build, on push/PR to `main`) and `e2e.yml` 
 
 
-## Getting Started
+> Chat Lab is a real app that turns chaotic when you ask it to:
+>
+> - **Real-world  behaviour, combinable** - cookie walls, flaky network, iframes - 15 flags, on one at a time or all at once.
+> - **Reproducible by seed** — ten different combinations of challenges from real world applications.
+> - **Flake Score** — runs your hard mode tests across all 10 seeds and tells how sustainable your tests are.
+
+![Turning on Hard Mode: iframe widgets, a tip over the Send button and a promo modal take over the chat](src/assets/hard_mode_demo.gif)
+
+## Hard Mode
+
+You know the feeling. The suite is green on your machine and on CI, and
+then one random Tuesday it isn't. A cookie banner showed up in front of the button.
+The API took four seconds instead of one. Someone removed a `data-testid`.
+Nothing in your tests was wrong — the app just stopped being polite.
+
+Flip "Hard mode" in the top-left corner and the same chat starts throwing real-world trouble at you:
+
+- popups that block the page and a promo that keeps coming back;
+- replies that take their time, messages that fail until you retry, and a
+rate limit that makes you wait;
+- a DOM that won't sit still — no test ids, lists that re-mount under your
+locators, search results in a different order, forms tucked inside iframes
+and shadow roots;
+- the browser's own quirks — files, a second tab, the clipboard, timestamps  
+that depend on the clock.
+
+### And then you find out how solid they are
+
+Passing once proves little. Flake Score runs your Hard Mode tests on all ten
+trouble combinations, twice each, and tells you how many came out clean. For the rest it tells
+you why: a failure you can replay by seed, a timing race the seed can't
+explain, or a test that isn't ready for these flags yet.
+
+```bash
+npm run flake-score
+```
+
+Learn more:
+**[src/HARD_MODE.md](src/HARD_MODE.md)**.
+
+## Learn Playwright on it
+
+An 11-lesson course (`[lessons/](lessons/README.md)`) uses this app as the
+system under test, from the anatomy of a test through locators, fixtures, the
+Page Object Model, network mocking and debugging to CI and parallelism. Each
+lesson pairs an explanation with a working demo and a homework exercise;
+homework is submitted as a pull request and checked by CI.
+
+The course runs the app in its normal mode. Hard Mode is the next step once
+your tests pass.
+
+## The app
+
+A small React/TypeScript chat with five screens — Chat, Search, Message
+history, Playground and Help. It runs fully offline: "Funny mode" answers with
+canned, deterministic replies, so the app and every test work without a
+backend. History is kept in `localStorage`.
+
+## Getting started
 
 ```bash
 npm install
 npx playwright install chromium
 
-npm run dev
+npm run dev     # the app on http://localhost:5173
 npm run lint
 npm run build
+npm test        # unit tests
 ```
+
+
 
 ## Testing
 
 ```bash
-# e2e/ suite
-npm run test:e2e
+npm run test:e2e        # e2e/ — the app's own suite and the hard mode suite
+npm run test:lessons    # lessons/ — the course
 
-# lessons/ course
-npm run test:lessons
-
-# either one, scoped to a single file
+# one file or folder
 npm run test:e2e -- e2e/tests/chat.spec.ts
 npm run test:lessons -- lessons/01-getting-started
-npm run test:e2e -- e2e/homework-done
 
-# open the last run's HTML report
+npm run flake-score     # hard mode tests on all 10 seeds
+
 npx playwright show-report
 ```
 
-`ci.yml` runs lint + build on every push/PR to `main`.
- `e2e.yml` doesn't run automatically — comment `e2e <path/to/spec.ts>` on a PR and it runs just
-that file, reporting back as a check on the PR's commit.
+`ci.yml` runs lint, unit tests and the build on every push and PR to `main`.
+For homework, comment `e2e <path/to/spec.ts>` on your PR to run just that file
 
 ## Contributing
 
-All types of contributions are very welcome!
-For homework assignments please refer to Submitting homework of lessons/README.md
+All kinds of contributions are welcome. For homework, see
+[Submitting homework](lessons/README.md#submitting-homework).
 
 ## License
 
