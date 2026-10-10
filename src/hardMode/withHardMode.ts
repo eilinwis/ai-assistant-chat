@@ -1,5 +1,6 @@
 import type { GetReply } from '../lib/replyService'
 import type { HardModeFlag } from './hardModeConfig'
+import type { Emit } from './telemetry'
 
 export class FlakyNetworkError extends Error {
   constructor() {
@@ -39,6 +40,7 @@ export interface HardModeChaos {
   runtime: HardModeRuntime
   now?: () => number
   sleep?: (ms: number) => Promise<void>
+  emit?: Emit
 }
 
 const defaultSleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
@@ -53,11 +55,14 @@ export function withHardMode(getReply: GetReply, chaos: HardModeChaos): GetReply
     const { isOn, rand, runtime } = chaos
     const now = (chaos.now ?? Date.now)()
     const sleep = chaos.sleep ?? defaultSleep
+    const emit = chaos.emit ?? (() => undefined)
 
     if (isOn('rate-limit')) {
       runtime.sendTimes = runtime.sendTimes.filter((t) => now - t < RATE_LIMIT.windowMs)
       if (runtime.sendTimes.length >= RATE_LIMIT.max) {
-        throw new RateLimitError(RATE_LIMIT.windowMs - (now - runtime.sendTimes[0]))
+        const retryAfterMs = RATE_LIMIT.windowMs - (now - runtime.sendTimes[0])
+        emit('rate-limit:hit', { retryAfterMs })
+        throw new RateLimitError(retryAfterMs)
       }
       runtime.sendTimes.push(now)
     }
@@ -66,14 +71,19 @@ export function withHardMode(getReply: GetReply, chaos: HardModeChaos): GetReply
 
     if (isOn('latency')) {
       const span = LATENCY_MS.max - LATENCY_MS.min
-      await sleep(LATENCY_MS.min + Math.floor(rand('latency', attempt) * span))
+      const ms = LATENCY_MS.min + Math.floor(rand('latency', attempt) * span)
+      emit('latency', { attempt, ms })
+      await sleep(ms)
     }
 
     if (isOn('flaky-network')) {
       // Never twice in a row, so a single Retry is always enough.
       const fail = !runtime.lastAttemptFailed && rand('flaky', attempt) < FLAKE_RATE
       runtime.lastAttemptFailed = fail
-      if (fail) throw new FlakyNetworkError()
+      if (fail) {
+        emit('flaky-network:failed', { attempt })
+        throw new FlakyNetworkError()
+      }
     }
 
     return getReply(text, mode)

@@ -19,8 +19,11 @@ export function useTid(): (id: string) => { 'data-testid'?: string } {
 
 /** The reply source, wrapped with whichever network-shaped flags are on. */
 export function useReplyService(): GetReply {
-  const { isOn, rand, runtime } = useHardMode()
-  return useMemo(() => withHardMode(getReply, { isOn, rand, runtime }), [isOn, rand, runtime])
+  const { isOn, rand, runtime, emit } = useHardMode()
+  return useMemo(
+    () => withHardMode(getReply, { isOn, rand, runtime, emit }),
+    [isOn, rand, runtime, emit],
+  )
 }
 
 /** Current time, re-read every `intervalMs` while `active`. */
