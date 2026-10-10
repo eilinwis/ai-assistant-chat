@@ -23,35 +23,32 @@ Chat Lab is a real app that turns chaotic when you ask it to:
 
 ## Hard Mode
 
-You know the feeling. The suite is green on your machine and on CI, and
-then one random Tuesday it isn't. A cookie banner showed up in front of the button.
-The API took four seconds instead of one. Someone removed a `data-testid`.
-Nothing in your tests was wrong — the app just stopped being polite.
+You know the feeling. The suite is green locally and on CI, and then one random
+Tuesday it isn't. A cookie banner landed in front of a button, the API took four
+seconds instead of one, someone removed a `data-testid`. Your tests weren't
+wrong — the app just stopped being polite.
 
-Flip "Hard mode" in the top-left corner and the same chat starts throwing real-world trouble at you:
+Flip "Hard mode" in the top-left corner and the same chat starts throwing that
+kind of trouble at you:
 
-- popups that block the page and a promo that keeps coming back;
-- replies that take their time, messages that fail until you retry, and a
-rate limit that makes you wait;
-- a DOM that won't sit still — no test ids, lists that re-mount under your
-locators, search results in a different order, forms tucked inside iframes
-and shadow roots;
-- the browser's own quirks — files, a second tab, the clipboard, timestamps  
-that depend on the clock.
+- popups that block the page, and a promo that keeps coming back;
+- slow replies, messages that fail until you retry, a rate limit that makes you
+  wait;
+- a DOM that won't sit still — no test ids, lists that re-mount, shuffled
+  search results, forms inside iframes and shadow roots;
+- browser quirks — files, a second tab, the clipboard, clock-dependent
+  timestamps.
 
-### And then you find out how solid they are
-
-Passing once proves little. Flake Score runs your Hard Mode tests on all ten
-trouble combinations, twice each, and tells you how many came out clean. For the rest it tells
-you why: a failure you can replay by seed, a timing race the seed can't
-explain, or a test that isn't ready for these flags yet.
+Passing once proves little. Flake Score runs your Hard Mode tests on ten
+variations of that trouble (seeds 1–10), twice each, and tells you how many came
+out clean — and for the rest, whether it's a failure you can replay, a timing
+race, or a test that isn't ready for these flags yet.
 
 ```bash
 npm run flake-score
 ```
 
-Learn more:
-**[src/HARD_MODE.md](src/HARD_MODE.md)**.
+Details: [src/HARD_MODE.md](src/HARD_MODE.md).
 
 ## Learn Playwright on it
 
